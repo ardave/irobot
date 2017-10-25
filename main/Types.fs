@@ -122,40 +122,40 @@ let sendCleaningModeCommand roomba cleaningModeCommand =
     match roomba.OperatingMode with
     | Off ->
         match cleaningModeCommand with
-        | Spot       -> ()
-        | Clean      ->()
-        | SeekDock   ->()
-        | Power      ->()
-        | Max        ->()
-        | Schedule   ->()
-        | SetDayTime ->()
+        | Spot       -> failwith "illegal"
+        | Clean      -> failwith "illegal"
+        | SeekDock   -> failwith "illegal"
+        | Power      -> failwith "illegal"
+        | Max        -> failwith "illegal"
+        | Schedule   -> failwith "illegal"
+        | SetDayTime -> failwith "illegal"
     | Passive ->
         match cleaningModeCommand with
-        | Spot       -> ()
-        | Clean      ->()
-        | SeekDock   ->()
-        | Power      ->()
-        | Max        ->()
-        | Schedule   ->()
-        | SetDayTime ->()
+        | Spot       -> xmitCommand Passive
+        | Clean      -> xmitCommand Passive
+        | SeekDock   -> xmitCommand Passive
+        | Power      -> xmitCommand Passive
+        | Max        -> xmitCommand Passive
+        | Schedule   -> xmitCommand roomba.OperatingMode
+        | SetDayTime -> xmitCommand roomba.OperatingMode
     | Safe ->
         match cleaningModeCommand with
-        | Spot       -> ()
-        | Clean      ->()
-        | SeekDock   ->()
-        | Power      ->()
-        | Max        ->()
-        | Schedule   ->()
-        | SetDayTime ->()
+        | Spot       -> xmitCommand Passive
+        | Clean      -> xmitCommand Passive
+        | SeekDock   -> xmitCommand Passive
+        | Power      -> xmitCommand Passive
+        | Max        -> xmitCommand Passive
+        | Schedule   -> xmitCommand roomba.OperatingMode
+        | SetDayTime -> xmitCommand roomba.OperatingMode
     | Full ->
         match cleaningModeCommand with
-        | Spot       -> ()
-        | Clean      ->()
-        | SeekDock   ->()
-        | Power      ->()
-        | Max        ->()
-        | Schedule   ->()
-        | SetDayTime ->()
+        | Spot       -> xmitCommand Passive
+        | Clean      -> xmitCommand Passive
+        | SeekDock   -> xmitCommand Passive
+        | Power      -> xmitCommand Passive
+        | Max        -> xmitCommand Passive
+        | Schedule   -> xmitCommand roomba.OperatingMode
+        | SetDayTime -> xmitCommand roomba.OperatingMode
 
 
 let sendModeCommand roomba command = 
