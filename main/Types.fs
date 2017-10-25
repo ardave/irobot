@@ -115,6 +115,49 @@ let sendCommand roomba command =
         | Stop  -> xmitCommand Off
         | Baud  -> xmitCommand roomba.OperatingMode
 
+let sendCleaningModeCommand roomba cleaningModeCommand =
+    let xmitCommand newMode =
+        cleaningModeCommand |> getCleaningModeCommandData |> transmitCommandData
+        { roomba with OperatingMode = newMode }
+    match roomba.OperatingMode with
+    | Off ->
+        match cleaningModeCommand with
+        | Spot       -> ()
+        | Clean      ->()
+        | SeekDock   ->()
+        | Power      ->()
+        | Max        ->()
+        | Schedule   ->()
+        | SetDayTime ->()
+    | Passive ->
+        match cleaningModeCommand with
+        | Spot       -> ()
+        | Clean      ->()
+        | SeekDock   ->()
+        | Power      ->()
+        | Max        ->()
+        | Schedule   ->()
+        | SetDayTime ->()
+    | Safe ->
+        match cleaningModeCommand with
+        | Spot       -> ()
+        | Clean      ->()
+        | SeekDock   ->()
+        | Power      ->()
+        | Max        ->()
+        | Schedule   ->()
+        | SetDayTime ->()
+    | Full ->
+        match cleaningModeCommand with
+        | Spot       -> ()
+        | Clean      ->()
+        | SeekDock   ->()
+        | Power      ->()
+        | Max        ->()
+        | Schedule   ->()
+        | SetDayTime ->()
+
+
 let sendModeCommand roomba command = 
     match command with 
     | _ -> { roomba with OperatingMode = Passive }
