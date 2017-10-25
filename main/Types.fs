@@ -86,61 +86,34 @@ let transmitCommandData (commandData:CommandData) =
     printfn "Transmitting CommandData: %A" commandData
 
 let sendCommand roomba command =
-    let xmitCommand = command |> getCommandData |> transmitCommandData
+    let xmitCommand newMode = 
+        command |> getCommandData |> transmitCommandData
+        { roomba with OperatingMode = newMode}
     match roomba.OperatingMode with 
     | Off ->
         match command with
-        | Start -> 
-            xmitCommand
-            { roomba with OperatingMode = Passive }
-        | Reset -> 
-            xmitCommand
-            { roomba with OperatingMode = Off }
-        | Stop -> failwith "illegal (but does it matter?)"
-        | Baud -> failwith "illegal (but does it matter?)"
+        | Start -> xmitCommand Passive
+        | Reset -> xmitCommand Off
+        | Stop  -> failwith "illegal (but does it matter?)"
+        | Baud  -> failwith "illegal (but does it matter?)"
     | Passive ->
         match command with
-        | Start -> 
-            xmitCommand
-            { roomba with OperatingMode = Passive }
-        | Reset -> 
-            xmitCommand
-            { roomba with OperatingMode = Off }
-        | Stop  ->  
-            xmitCommand
-            { roomba with OperatingMode = Off }
-        | Baud  -> 
-            xmitCommand
-            roomba
+        | Start -> xmitCommand Passive
+        | Reset -> xmitCommand Off
+        | Stop  -> xmitCommand Off
+        | Baud  -> xmitCommand roomba.OperatingMode
     | Safe ->
         match command with
-        | Start -> 
-            xmitCommand
-            { roomba with OperatingMode = Passive }
-        | Reset -> 
-            xmitCommand
-            { roomba with OperatingMode = Off }
-        | Stop  ->  
-            xmitCommand
-            { roomba with OperatingMode = Off }
-        | Baud  -> 
-            xmitCommand
-            roomba
+        | Start -> xmitCommand Passive
+        | Reset -> xmitCommand Off
+        | Stop  -> xmitCommand Off
+        | Baud  -> xmitCommand roomba.OperatingMode
     | Full ->
         match command with
-        | Start -> 
-            xmitCommand
-            { roomba with OperatingMode = Passive }
-        | Reset -> 
-            xmitCommand
-            { roomba with OperatingMode = Off }
-        | Stop  ->  
-            xmitCommand
-            { roomba with OperatingMode = Off }
-        | Baud  -> 
-            xmitCommand
-            roomba
-    
+        | Start -> xmitCommand Passive
+        | Reset -> xmitCommand Off
+        | Stop  -> xmitCommand Off
+        | Baud  -> xmitCommand roomba.OperatingMode
 
 let sendModeCommand roomba command = 
     match command with 
