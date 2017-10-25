@@ -82,10 +82,65 @@ let getInputCommandData inputCommand =
     | Stream            -> { OpCode = 148; DataBytes = 1 } // actually N + 1, where N is the number of packets requested.
     | PauseResumeStream -> { OpCode = 150; DataBytes = 1 }
 
+let transmitCommandData (commandData:CommandData) =
+    printfn "Transmitting CommandData: %A" commandData
+
 let sendCommand roomba command =
-    match command with 
-    | Start -> { roomba with OperatingMode = Passive }
-    | _     -> failwith "find something better than failwith"
+    let xmitCommand = command |> getCommandData |> transmitCommandData
+    match roomba.OperatingMode with 
+    | Off ->
+        match command with
+        | Start -> 
+            xmitCommand
+            { roomba with OperatingMode = Passive }
+        | Reset -> 
+            xmitCommand
+            { roomba with OperatingMode = Off }
+        | Stop -> failwith "illegal (but does it matter?)"
+        | Baud -> failwith "illegal (but does it matter?)"
+    | Passive ->
+        match command with
+        | Start -> 
+            xmitCommand
+            { roomba with OperatingMode = Passive }
+        | Reset -> 
+            xmitCommand
+            { roomba with OperatingMode = Off }
+        | Stop  ->  
+            xmitCommand
+            { roomba with OperatingMode = Off }
+        | Baud  -> 
+            xmitCommand
+            roomba
+    | Safe ->
+        match command with
+        | Start -> 
+            xmitCommand
+            { roomba with OperatingMode = Passive }
+        | Reset -> 
+            xmitCommand
+            { roomba with OperatingMode = Off }
+        | Stop  ->  
+            xmitCommand
+            { roomba with OperatingMode = Off }
+        | Baud  -> 
+            xmitCommand
+            roomba
+    | Full ->
+        match command with
+        | Start -> 
+            xmitCommand
+            { roomba with OperatingMode = Passive }
+        | Reset -> 
+            xmitCommand
+            { roomba with OperatingMode = Off }
+        | Stop  ->  
+            xmitCommand
+            { roomba with OperatingMode = Off }
+        | Baud  -> 
+            xmitCommand
+            roomba
+    
 
 let sendModeCommand roomba command = 
     match command with 
