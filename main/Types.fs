@@ -7,8 +7,8 @@ type OperatingMode =
 | Full
 
 type CommandData = {
-    OpCode: int
-    DataBytes: int
+    OpCode: byte
+    DataBytes: byte array
 }
 
 // Pg 6 at the top suggests that this type of command might be 
@@ -48,42 +48,57 @@ type InputCommand =
 | Stream
 | PauseResumeStream
 
+type Baud =
+| ``300``    =  0uy
+| ``600``    =  1uy
+| ``1200``   =  2uy
+| ``2400``   =  3uy
+| ``4800``   =  4uy
+| ``9600``   =  5uy
+| ``14400``  =  6uy
+| ``19200``  =  7uy
+| ``28800``  =  8uy
+| ``38400``  =  9uy
+| ``57600``  = 10uy
+| ``115200`` = 11uy
+
 type Roomba = {
     OperatingMode: OperatingMode
 }
 
 let getCommandData command =
     match command with
-    | Start -> { OpCode = 128; DataBytes = 0 }
-    | Reset -> { OpCode =   7; DataBytes = 0 }
-    | Stop  -> { OpCode = 173; DataBytes = 0 }
-    | Baud  -> { OpCode = 129; DataBytes = 1 }
+    | Start -> { OpCode = 128uy; DataBytes = Array.empty } //✓
+    | Reset -> { OpCode =   7uy; DataBytes = Array.empty } //✓
+    | Stop  -> { OpCode = 173uy; DataBytes = Array.empty } //✓
+    | Baud  -> { OpCode = 129uy; DataBytes = [|byte Baud.``115200``|] }
 
 let getOperatingModeCommandData operatingMode = 
     match operatingMode with 
-    | Safe -> { OpCode = 131; DataBytes = 0 }
-    | Full -> { OpCode = 132; DataBytes = 0 }
-    | _    -> failwith "not covered by manual!"
+    | Safe -> { OpCode = 131uy; DataBytes = Array.empty }
+    | Full -> { OpCode = 132uy; DataBytes = Array.empty }
+    | _    -> failwith "not covered by the manual!"
 
 let getCleaningModeCommandData cleaningMode =
     match cleaningMode with 
-    | Spot       -> { OpCode = 134; DataBytes = 0  }
-    | Clean      -> { OpCode = 135; DataBytes = 0  }
-    | SeekDock   -> { OpCode = 143; DataBytes = 0  }
-    | Power      -> { OpCode = 133; DataBytes = 0  }
-    | Max        -> { OpCode = 136; DataBytes = 0  }
-    | Schedule   -> { OpCode = 167; DataBytes = 15 }
-    | SetDayTime -> { OpCode = 168; DataBytes = 3  }
+    | Spot       -> { OpCode = 134uy; DataBytes = Array.empty  } //✓
+    | Clean      -> { OpCode = 135uy; DataBytes = Array.empty  } //✓
+    | SeekDock   -> { OpCode = 143uy; DataBytes = Array.empty  } //✓
+    | Power      -> { OpCode = 133uy; DataBytes = Array.empty  } //✓
+    | Max        -> { OpCode = 136uy; DataBytes = Array.empty  } //✓
+    | Schedule   -> { OpCode = 167uy; DataBytes = Array.empty  }
+    | SetDayTime -> { OpCode = 168uy; DataBytes = Array.empty  }
 
 let getInputCommandData inputCommand =
     match inputCommand with 
-    | Sensors           -> { OpCode = 142; DataBytes = 1 }
-    | QueryList         -> { OpCode = 149; DataBytes = 1 } // actually N + 1, where N is the number of packets requested. 
-    | Stream            -> { OpCode = 148; DataBytes = 1 } // actually N + 1, where N is the number of packets requested.
-    | PauseResumeStream -> { OpCode = 150; DataBytes = 1 }
+    | Sensors           -> { OpCode = 142uy; DataBytes = Array.empty }
+    | QueryList         -> { OpCode = 149uy; DataBytes = Array.empty } // actually N + 1, where N is the number of packets requested. 
+    | Stream            -> { OpCode = 148uy; DataBytes = Array.empty } // actually N + 1, where N is the number of packets requested.
+    | PauseResumeStream -> { OpCode = 150uy; DataBytes = Array.empty }
 
-let transmitCommandData (commandData:CommandData) =
-    printfn "Transmitting CommandData: %A" commandData
+let transmitCommandData commandData =
+    let dataSequence = Array.append [|commandData.OpCode|] commandData.DataBytes
+    printfn "Transmitting CommandData: %A" dataSequence
 
 let sendCommand roomba command =
     let xmitCommand newMode = 
