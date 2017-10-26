@@ -61,7 +61,6 @@
     <Compile Include="CleaningMode.fs" />
     <Compile Include="Command.fs" />
     <Compile Include="InputCommand.fs" />
-    <Compile Include="Types.fs" />
     <Compile Include="Program.fs" />
     <None Include="packages.config" />
   </ItemGroup>
