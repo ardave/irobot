@@ -1,23 +1,12 @@
 module Types
 
+open iRobot
+
 type OperatingMode =
 | Off
 | Passive
 | Safe
 | Full
-
-type CommandData = {
-    OpCode: byte
-    DataBytes: byte array
-}
-
-// Pg 6 at the top suggests that this type of command might be 
-// different from the CleaningModeCommand
-type Command =
-| Start
-| Reset
-| Stop
-| Baud
 
 type CleaningMode =
 | Spot
@@ -48,30 +37,9 @@ type InputCommand =
 | Stream
 | PauseResumeStream
 
-type Baud =
-| ``300``    =  0uy
-| ``600``    =  1uy
-| ``1200``   =  2uy
-| ``2400``   =  3uy
-| ``4800``   =  4uy
-| ``9600``   =  5uy
-| ``14400``  =  6uy
-| ``19200``  =  7uy
-| ``28800``  =  8uy
-| ``38400``  =  9uy
-| ``57600``  = 10uy
-| ``115200`` = 11uy
-
 type Roomba = {
     OperatingMode: OperatingMode
 }
-
-let getCommandData command =
-    match command with
-    | Start -> { OpCode = 128uy; DataBytes = Array.empty } //✓
-    | Reset -> { OpCode =   7uy; DataBytes = Array.empty } //✓
-    | Stop  -> { OpCode = 173uy; DataBytes = Array.empty } //✓
-    | Baud  -> { OpCode = 129uy; DataBytes = [|byte Baud.``115200``|] }
 
 let getOperatingModeCommandData operatingMode = 
     match operatingMode with 
@@ -101,34 +69,34 @@ let transmitCommandData commandData =
     printfn "Transmitting CommandData: %A" dataSequence
 
 let sendCommand roomba command =
-    let xmitCommand newMode = 
-        command |> getCommandData |> transmitCommandData
+    let xmitCommand commandData newMode = 
+        commandData |> transmitCommandData
         { roomba with OperatingMode = newMode}
     match roomba.OperatingMode with 
     | Off ->
         match command with
-        | Start -> xmitCommand Passive
-        | Reset -> xmitCommand Off
-        | Stop  -> failwith "illegal (but does it matter?)"
-        | Baud  -> failwith "illegal (but does it matter?)"
+        | Start commandData -> xmitCommand commandData Passive
+        | Reset commandData -> xmitCommand commandData Off
+        | Stop  _ -> failwith "illegal (but does it matter?)"
+        | Baud  _ -> failwith "illegal (but does it matter?)"
     | Passive ->
         match command with
-        | Start -> xmitCommand Passive
-        | Reset -> xmitCommand Off
-        | Stop  -> xmitCommand Off
-        | Baud  -> xmitCommand roomba.OperatingMode
+        | Start commandData -> xmitCommand commandData Passive
+        | Reset commandData -> xmitCommand commandData Off
+        | Stop  commandData -> xmitCommand commandData Off
+        | Baud  commandData -> xmitCommand commandData roomba.OperatingMode
     | Safe ->
         match command with
-        | Start -> xmitCommand Passive
-        | Reset -> xmitCommand Off
-        | Stop  -> xmitCommand Off
-        | Baud  -> xmitCommand roomba.OperatingMode
+        | Start commandData -> xmitCommand commandData Passive
+        | Reset commandData -> xmitCommand commandData Off
+        | Stop  commandData -> xmitCommand commandData Off
+        | Baud  commandData -> xmitCommand commandData roomba.OperatingMode
     | Full ->
         match command with
-        | Start -> xmitCommand Passive
-        | Reset -> xmitCommand Off
-        | Stop  -> xmitCommand Off
-        | Baud  -> xmitCommand roomba.OperatingMode
+        | Start commandData -> xmitCommand commandData Passive
+        | Reset commandData -> xmitCommand commandData Off
+        | Stop  commandData -> xmitCommand commandData Off
+        | Baud  commandData -> xmitCommand commandData roomba.OperatingMode
 
 let sendCleaningModeCommand roomba cleaningModeCommand =
     let xmitCommand newMode =

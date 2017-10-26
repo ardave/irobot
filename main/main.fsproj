@@ -52,6 +52,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="BaudRate.fs" />
+    <Compile Include="CommandData.fs" />
+    <Compile Include="Command.fs" />
     <Compile Include="Types.fs" />
     <Compile Include="Program.fs" />
     <None Include="packages.config" />
