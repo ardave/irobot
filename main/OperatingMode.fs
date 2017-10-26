@@ -1,15 +1,15 @@
-namespace iRobot
+[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+module OperatingMode
 
+open iRobot
+
+// I think I need to distinguish between OperatingMode *state*,
+// and operating mode *commands.*
 type OperatingMode =
 | Off
 | Passive
-| Safe
-| Full
+| Safe of CommandData
+| Full of CommandData
 
-
-module OMFuncs =
-    let getOperatingModeCommandData operatingMode = 
-        match operatingMode with 
-        | Safe -> { OpCode = 131uy; DataBytes = Array.empty }
-        | Full -> { OpCode = 132uy; DataBytes = Array.empty }
-        | _    -> failwith "not covered by the manual!"
+let createSafe = Safe <| { OpCode = 131uy; DataBytes = Array.empty }
+let createFull = Full <| { OpCode = 132uy; DataBytes = Array.empty }

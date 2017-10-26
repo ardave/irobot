@@ -1,6 +1,7 @@
 namespace iRobot
 
 open Communicator
+open OperatingMode
 
 // Pg 6 at the top suggests that this type of command might be 
 // different from the CleaningModeCommand
@@ -33,13 +34,13 @@ module CommandConstructors =
             | Reset commandData -> xmitCommand commandData Off
             | Stop  commandData -> xmitCommand commandData Off
             | Baud  commandData -> xmitCommand commandData roomba.OperatingMode
-        | Safe ->
+        | Safe _ ->
             match command with
             | Start commandData -> xmitCommand commandData Passive
             | Reset commandData -> xmitCommand commandData Off
             | Stop  commandData -> xmitCommand commandData Off
             | Baud  commandData -> xmitCommand commandData roomba.OperatingMode
-        | Full ->
+        | Full _ ->
             match command with
             | Start commandData -> xmitCommand commandData Passive
             | Reset commandData -> xmitCommand commandData Off

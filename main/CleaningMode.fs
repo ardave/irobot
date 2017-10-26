@@ -1,6 +1,7 @@
 namespace iRobot
 
 open Communicator
+open OperatingMode
 
 type CleaningMode =
 | Spot
@@ -45,7 +46,7 @@ module CleaningModeConstructors =
             | Max        -> xmitCommand Passive
             | Schedule   -> xmitCommand roomba.OperatingMode
             | SetDayTime -> xmitCommand roomba.OperatingMode
-        | Safe ->
+        | Safe _ ->
             match cleaningModeCommand with
             | Spot       -> xmitCommand Passive
             | Clean      -> xmitCommand Passive
@@ -54,7 +55,7 @@ module CleaningModeConstructors =
             | Max        -> xmitCommand Passive
             | Schedule   -> xmitCommand roomba.OperatingMode
             | SetDayTime -> xmitCommand roomba.OperatingMode
-        | Full ->
+        | Full _ ->
             match cleaningModeCommand with
             | Spot       -> xmitCommand Passive
             | Clean      -> xmitCommand Passive
