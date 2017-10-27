@@ -15,12 +15,48 @@ module CleaningMode =
     | Schedule   of CommandData
     | SetDayTime of CommandData
 
+    type ScheduleTime = {
+        Hour  : int
+        Minute: int
+    }
+
+    type Schedule = {
+        Sunday   : ScheduleTime
+        Monday   : ScheduleTime
+        Tuesday  : ScheduleTime
+        Wednesday: ScheduleTime
+        Thursday : ScheduleTime
+        Friday   : ScheduleTime
+        Saturday : ScheduleTime
+    }
+
     let createSpot       = { OpCode = 134uy; DataBytes = Array.empty }
     let createClean      = { OpCode = 135uy; DataBytes = Array.empty }
     let createSeekDock   = { OpCode = 143uy; DataBytes = Array.empty }
     let createPower      = { OpCode = 133uy; DataBytes = Array.empty }
     let createMax        = { OpCode = 136uy; DataBytes = Array.empty }
-    let createSchedule   = { OpCode = 167uy; DataBytes = Array.empty }
+    let createSchedule schedule  = 
+        let binaryValueForSettingAllWeekDays = 127
+        let data = 
+            [|
+            binaryValueForSettingAllWeekDays
+            schedule.Sunday.Hour
+            schedule.Sunday.Minute
+            schedule.Monday.Hour
+            schedule.Monday.Minute
+            schedule.Tuesday.Hour
+            schedule.Tuesday.Minute
+            schedule.Wednesday.Hour
+            schedule.Wednesday.Minute
+            schedule.Thursday.Hour
+            schedule.Thursday.Minute
+            schedule.Friday.Hour
+            schedule.Friday.Minute
+            schedule.Saturday.Hour
+            schedule.Saturday.Minute
+            |]
+            |> Array.map byte
+        { OpCode = 167uy; DataBytes = data }
     let createSetDayTime (dateTime:DateTime) =
         let data = 
             [| int dateTime.DayOfWeek; dateTime.Hour; dateTime.Minute |]
