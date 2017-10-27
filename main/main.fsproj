@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="UnitsOfMeasure.fs" />
     <Compile Include="BaudRate.fs" />
     <Compile Include="CommandData.fs" />
     <Compile Include="Communicator.fs" />

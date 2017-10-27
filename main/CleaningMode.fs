@@ -36,10 +36,10 @@ module CleaningMode =
     let createPower      = { OpCode = 133uy; DataBytes = Array.empty }
     let createMax        = { OpCode = 136uy; DataBytes = Array.empty }
     let createSchedule schedule  = 
-        let binaryValueForSettingAllWeekDays = 127
+        let setAllWeekdaysAtOnce = 127
         let data = 
             [|
-            binaryValueForSettingAllWeekDays
+            setAllWeekdaysAtOnce
             schedule.Sunday.Hour
             schedule.Sunday.Minute
             schedule.Monday.Hour
