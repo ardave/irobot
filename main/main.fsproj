@@ -57,6 +57,7 @@
     <Compile Include="CommandData.fs" />
     <Compile Include="Communicator.fs" />
     <Compile Include="OperatingMode.fs" />
+    <Compile Include="SensorData.fs" />
     <Compile Include="Roomba.fs" />
     <Compile Include="ActuatorCommand.fs" />
     <Compile Include="CleaningMode.fs" />
