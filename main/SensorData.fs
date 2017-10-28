@@ -146,11 +146,6 @@ let defaultSensorData = {
     Stasis                       = None
 }
 
-// bool IsBitSet(byte b, int pos)
-// {
-//    return (b & (1 << pos)) != 0;
-// }
-
 let inline isBitSet b pos =
     b &&& (1 <<< pos) <> 0
 
