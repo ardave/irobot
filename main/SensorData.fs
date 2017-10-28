@@ -3,28 +3,28 @@ module Sensors
 open iRobot
 
 type BumpDrop = {
-    WheelDropLeft                : bool
-    WheelDropRight               : bool
-    BumpLeft                     : bool
-    BumpRight                    : bool
+    WheelDropLeft  : bool
+    WheelDropRight : bool
+    BumpLeft       : bool
+    BumpRight      : bool
 }
 
 type WheelOvercurrents = {
-    LeftWheelOvercurrent         : bool
-    RightWheelOvercurrent        : bool
-    MainBrushOvercurrent         : bool
-    SideBrushOvercurrent         : bool
+    LeftWheelOvercurrent  : bool
+    RightWheelOvercurrent : bool
+    MainBrushOvercurrent  : bool
+    SideBrushOvercurrent  : bool
 }
 
 type Buttons = {
-    Clock:    bool
+    Clock   : bool
     Schedule: bool
-    Day:      bool
-    Hour:     bool
-    Minute:   bool
-    Dock:     bool
-    Spot:     bool
-    Clean:    bool
+    Day     : bool
+    Hour    : bool
+    Minute  : bool
+    Dock    : bool
+    Spot    : bool
+    Clean   : bool
 }
 
 type ChargingState =
@@ -146,8 +146,8 @@ let defaultSensorData = {
     Stasis                       = None
 }
 
-let inline isBitSet b pos =
-    b &&& (1 <<< pos) <> 0
+let inline isBitSet pos b =
+    b &&& (byte 1 <<< pos) <> byte 0
 
 let parseBumpsWheeldrops b =
     {
@@ -156,3 +156,38 @@ let parseBumpsWheeldrops b =
         WheelDropRight = b |> isBitSet 2
         WheelDropLeft  = b |> isBitSet 3
     }
+
+let private firstBitOfByteToBool b = b |> isBitSet 0
+
+let parseWall = firstBitOfByteToBool
+let parseCliffLeft = firstBitOfByteToBool
+let parseCliffFrontLeft = firstBitOfByteToBool
+let parseCliffFrontRight = firstBitOfByteToBool
+let parseCliffRight = firstBitOfByteToBool
+let parseVirtualWall = firstBitOfByteToBool
+let parseWheelOvercurrents b =
+    {
+        SideBrushOvercurrent  = b |> isBitSet 0
+        MainBrushOvercurrent  = b |> isBitSet 1
+        RightWheelOvercurrent = b |> isBitSet 3
+        LeftWheelOvercurrent  = b |> isBitSet 4
+    }
+let parseDirtDetect (b:byte) = int b
+let parseInfraredCharacterOmni (b:byte) = int b
+let parseInfraredCharacterLeft (b:byte) = int b
+let parseInfraredCharacterRight (b:byte) = int b
+let parseButtons b =
+    {
+        Clock    = b |> isBitSet 7
+        Schedule = b |> isBitSet 6
+        Day      = b |> isBitSet 5
+        Hour     = b |> isBitSet 4
+        Minute   = b |> isBitSet 3
+        Dock     = b |> isBitSet 2
+        Spot     = b |> isBitSet 1
+        Clean    = b |> isBitSet 0
+    }
+
+
+
+
