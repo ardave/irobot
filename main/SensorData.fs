@@ -146,5 +146,18 @@ let defaultSensorData = {
     Stasis                       = None
 }
 
-let parse26ByteArray byteArray =
-    ()
+// bool IsBitSet(byte b, int pos)
+// {
+//    return (b & (1 << pos)) != 0;
+// }
+
+let inline isBitSet b pos =
+    b &&& (1 <<< pos) <> 0
+
+let parseBumpsWheeldrops b =
+    {
+        BumpRight      = b |> isBitSet 0
+        BumpLeft       = b |> isBitSet 1
+        WheelDropRight = b |> isBitSet 2
+        WheelDropLeft  = b |> isBitSet 3
+    }
