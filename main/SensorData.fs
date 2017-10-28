@@ -2,6 +2,13 @@ module Sensors
 
 open iRobot
 
+type BumpDrop = {
+    WheelDropLeft                : bool
+    WheelDropRight               : bool
+    BumpLeft                     : bool
+    BumpRight                    : bool
+}
+
 type Buttons = {
     Clock:    bool
     Schedule: bool
@@ -36,10 +43,7 @@ type LightBumper = {
 }
 
 type SensorData = {
-    WheelDropLeft                : bool option
-    WheelDropRight               : bool option
-    BumpLeft                     : bool option
-    BumpRight                    : bool option
+    BumpDrop                     : BumpDrop option
     Wall                         : bool option
     CliffLeft                    : bool option
     CliffFrontLeft               : bool option
@@ -86,3 +90,55 @@ type SensorData = {
     SideBrushMotorCurrent        : int<mA> option
     Stasis                       : bool option
 }
+
+let defaultSensorData = {
+    BumpDrop                     = None
+    Wall                         = None
+    CliffLeft                    = None
+    CliffFrontLeft               = None
+    CliffFrontRight              = None
+    CliffRight                   = None
+    VirtualWall                  = None
+    LeftWheelOvercurrent         = None
+    RightWheelOvercurrent        = None
+    MainBrushOvercurrent         = None
+    SideBrushOvercurrent         = None
+    DirtDetect                   = None
+    InfraredCharacterOmni        = None
+    InfraredCharacterLeft        = None
+    InfraredCharacterRight       = None
+    Buttons                      = None
+    Distance                     = None
+    Angle                        = None
+    ChargingState                = None
+    BatteryVoltage               = None
+    BatteryCurrent               = None
+    BatteryTemperature           = None
+    BatteryCharge                = None
+    BatteryCapacity              = None
+    WallSignal                   = None
+    CliffLeftSignal              = None
+    CliffFrontLeftSignal         = None
+    CliffFrontRightSignal        = None
+    CliffRightSignal             = None
+    ChargingSourcesAvailable     = None
+    OIMode                       = None
+    SelectedSongNumber           = None
+    PlayingSongNumber            = None
+    NumberOfStringPacketsReturned= None
+    RequestedVelocity            = None
+    RequestedRadius              = None
+    RequestedRightVelocity       = None
+    RequestedLeftVelocity        = None
+    LeftEncoderCounts            = None
+    RightEncoderCounts           = None
+    LightBumper                  = None
+    LeftMotorCurrent             = None
+    RightMotorCurrent            = None
+    MainBrushMotorCurrent        = None
+    SideBrushMotorCurrent        = None
+    Stasis                       = None
+}
+
+let parse26ByteArray byteArray =
+    ()
