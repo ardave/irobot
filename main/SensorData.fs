@@ -9,6 +9,13 @@ type BumpDrop = {
     BumpRight                    : bool
 }
 
+type WheelOvercurrents = {
+    LeftWheelOvercurrent         : bool
+    RightWheelOvercurrent        : bool
+    MainBrushOvercurrent         : bool
+    SideBrushOvercurrent         : bool
+}
+
 type Buttons = {
     Clock:    bool
     Schedule: bool
@@ -42,6 +49,11 @@ type LightBumper = {
     Left       : bool
 }
 
+// Physical sense: Sensors that detect the environment, like bump, cliff, and wall sensors
+// Buttons and internal sense: The state of the panel and remote buttons, and the computed
+// distance and angle values
+// Power sense: The state of the battery and charging systems
+ 
 type SensorData = {
     BumpDrop                     : BumpDrop option
     Wall                         : bool option
@@ -50,10 +62,7 @@ type SensorData = {
     CliffFrontRight              : bool option
     CliffRight                   : bool option
     VirtualWall                  : bool option
-    LeftWheelOvercurrent         : bool option
-    RightWheelOvercurrent        : bool option
-    MainBrushOvercurrent         : bool option
-    SideBrushOvercurrent         : bool option
+    WheelOvercurrents            : WheelOvercurrents option
     DirtDetect                   : int option
     InfraredCharacterOmni        : int option
     InfraredCharacterLeft        : int option
@@ -99,10 +108,7 @@ let defaultSensorData = {
     CliffFrontRight              = None
     CliffRight                   = None
     VirtualWall                  = None
-    LeftWheelOvercurrent         = None
-    RightWheelOvercurrent        = None
-    MainBrushOvercurrent         = None
-    SideBrushOvercurrent         = None
+    WheelOvercurrents            = None
     DirtDetect                   = None
     InfraredCharacterOmni        = None
     InfraredCharacterLeft        = None
