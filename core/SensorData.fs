@@ -39,6 +39,7 @@ type ChargingSource =
 | InternalCharger
 | HomeBase
 | Both
+| Neither
 
 type LightBumper = {
     Right      : bool
@@ -212,6 +213,8 @@ let parseChargingState (b:byte) =
     | 5 -> ChargingFaultCondition
     | x -> failwithf "Unknown charging state of %i" x
 
+// todo: Generalize these next few functions, once confident
+// that signing/unsigning of its is/are correct:
 let parseVoltage (ba:byte array) = 
     let result = ResultBuilder()
     result {
@@ -219,20 +222,41 @@ let parseVoltage (ba:byte array) =
         let voltage = numbers * 1<mV>
         return voltage
     }
-
-let parseCurrent (ba:byte array) = 
+let parseCurrent ba = 
     let result = ResultBuilder()
     result {
         let! numbers = parseTwoByteWord "Battery Current" ba
         let current = numbers * 1<mA>
         return current
     }
+let parseTemperature = int
+let parseBatteryCharge ba =
+    let result = ResultBuilder()
+    result {
+        let! numbers = parseTwoByteWord "Battery Charge" ba
+        let current = numbers * 1<mAh>
+        return current
+    } 
+let parseBatteryCapacity ba =
+    let result = ResultBuilder()
+    result {
+        let! numbers = parseTwoByteWord "Battery Capacity" ba
+        let current = numbers * 1<mAh>
+        return current
+    }
+let parseWallSignal            ba = parseTwoByteWord "Wall Signal"              ba
+let parseCliffLeftSignal       ba = parseTwoByteWord "Cliff Left Signal"        ba
+let parseCliffFrontLeftSignal  ba = parseTwoByteWord "Cliff Front Left Signal"  ba
+let parseCliffFrontRightSignal ba = parseTwoByteWord "Cliff Front Right Signal" ba
+let parseCliffRightSignal      ba = parseTwoByteWord "Cliff Right Signal"       ba
+let parseChargingSourcesAvailable b =
+    let bit0 = b |> isBitSet 0
+    let bit1 = b |> isBitSet 1
+    match (bit0, bit1) with 
+    | true , true  -> Both
+    | true , false -> InternalCharger
+    | false, true  -> HomeBase
+    | false, false -> Neither
+let parseOIMode b =
+    ()
     
- 
-
-
-
-
-
-
-
