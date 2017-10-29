@@ -215,13 +215,19 @@ let parseChargingState (b:byte) =
 let parseVoltage (ba:byte array) = 
     let result = ResultBuilder()
     result {
-        let! voltage = parseTwoByteWord "Battery Voltage" ba
+        let! numbers = parseTwoByteWord "Battery Voltage" ba
+        let voltage = numbers * 1<mV>
         return voltage
     }
 
-    // parseTwoByteWord "Battery Voltage" ba
-    // |> Result.map <| (*) 1.<mV>
-let parseCurrent = parseTwoByteWord "Battery Current"
+let parseCurrent (ba:byte array) = 
+    let result = ResultBuilder()
+    result {
+        let! numbers = parseTwoByteWord "Battery Current" ba
+        let current = numbers * 1<mA>
+        return current
+    }
+    
  
 
 
