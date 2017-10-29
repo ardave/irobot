@@ -49,6 +49,8 @@ type LightBumper = {
     Left       : bool
 }
 
+// Possible categories for partitioning this huge record type:
+//
 // Physical sense: Sensors that detect the environment, like bump, cliff, and wall sensors
 // Buttons and internal sense: The state of the panel and remote buttons, and the computed
 // distance and angle values
@@ -149,6 +151,18 @@ let defaultSensorData = {
 let inline isBitSet pos b =
     b &&& (byte 1 <<< pos) <> byte 0
 
+let parseTwoByteWord opName byteArray =
+    // I do not think I have yet accounted for the possibility of the result
+    // being signed vs unsigned
+    match byteArray |> Array.length with
+    | 2 -> 
+        byteArray
+        |> Array.map int
+        |> fun intArray -> (intArray.[1] <<< 8) ||| intArray.[0]
+        |> Ok
+    | x -> 
+        Error (sprintf "Expected %s to be 2-byte array, but length was %i" opName x)
+
 let parseBumpsWheeldrops b =
     {
         BumpRight      = b |> isBitSet 0
@@ -158,7 +172,6 @@ let parseBumpsWheeldrops b =
     }
 
 let private firstBitOfByteToBool b = b |> isBitSet 0
-
 let parseWall = firstBitOfByteToBool
 let parseCliffLeft = firstBitOfByteToBool
 let parseCliffFrontLeft = firstBitOfByteToBool
@@ -187,6 +200,32 @@ let parseButtons b =
         Spot     = b |> isBitSet 1
         Clean    = b |> isBitSet 0
     }
+let parseDistance = parseTwoByteWord "Distance"
+let parseAngle = parseTwoByteWord "Angle"
+let parseChargingState (b:byte) =
+    match int b with 
+    | 0 -> NotCharging
+    | 1 -> ReconditioningCharging
+    | 2 -> FullCharging
+    | 3 -> TrickleCharging
+    | 4 -> Waiting
+    | 5 -> ChargingFaultCondition
+    | x -> failwithf "Unknown charging state of %i" x
+
+let parseVoltage (ba:byte array) = 
+    let result = ResultBuilder()
+    result {
+        let! voltage = parseTwoByteWord "Battery Voltage" ba
+        return voltage
+    }
+
+    // parseTwoByteWord "Battery Voltage" ba
+    // |> Result.map <| (*) 1.<mV>
+let parseCurrent = parseTwoByteWord "Battery Current"
+ 
+
+
+
 
 
 
