@@ -257,6 +257,43 @@ let parseChargingSourcesAvailable b =
     | true , false -> InternalCharger
     | false, true  -> HomeBase
     | false, false -> Neither
+
+// Might make more sense to have separate OI Mode for parsed response, vs
+// OperatingMode for a command which changes the mode:
 let parseOIMode b =
-    ()
+    match int b with
+    | 0 -> OperatingMode.Off
+    | 1 -> OperatingMode.Passive
+    | 2 -> OperatingMode.createSafe
+    | 3 -> OperatingMode.createFull
+    | _ -> failwith "Unrecognized OI/Operating Mode"
     
+let parseCurrentlySelectedSongNumber = int
+let parseSongPlaying b =
+    match int b with 
+    | 1 -> true
+    | _ -> false
+
+let parseNumberOfStreamPackets = int
+let parseRequestedVelocity ba =
+    let result = ResultBuilder()
+    result {
+        let! numbers = parseTwoByteWord "Requested Velocity" ba
+        let velocity = numbers * 1<velocity>
+        return velocity
+    }
+let parseRequestedRadius ba =
+    let result = ResultBuilder()
+    result {
+        let! numbers = parseTwoByteWord "Requested Radius" ba
+        let radius = numbers * 1<mm>
+        return radius
+    }
+// trying once without using Computation Expression, just to see
+// how it feels in comparison:
+let parseRequestedRightVelocity ba =
+    match parseTwoByteWord "Requested Right Velocity" ba with
+    | Ok number -> Ok(number * 1<mm>)
+    | Error x -> Error(x)
+
+
