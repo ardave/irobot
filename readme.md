@@ -5,3 +5,6 @@ Code thus far is based solely on owner's manual description of the Open Interfac
 Initially targeting Mono over Dotnet Core due to better Raspberry Pi compatibility.
 
 Serial IO will use https://github.com/jcurl/SerialPortStream. 
+  It is recommended to build one's own copy of libnserial.so.1 using the instructions under 
+  the "Or you can build and install in your system:" section.  Also, I have found that this 
+  final step to be necessary: https://github.com/dotnet/core/issues/740#issuecomment-314558139
