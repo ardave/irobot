@@ -16,7 +16,7 @@ let createMessageAgent() =
         let! msg = inbox.Receive()
         
         match msg with
-        | UserKeyPress keyInfo -> printfn "Pressed: %s" <| keyInfo.ToString()
+        | UserKeyPress keyInfo -> printfn "Pressed: %c" <| keyInfo.KeyChar
         | ByteReceivedFromRobot b -> printfn "%i received." b
 
         // loop to top
