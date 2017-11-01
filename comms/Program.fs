@@ -1,5 +1,6 @@
 ﻿module iRobot.Comms
 
+open System
 open RJCP.IO.Ports
 
 let realConnection port =
@@ -11,10 +12,14 @@ let realConnection port =
         (fun a ->
             src.Read(inputBuffer, 0, 1) |> ignore
             byteReceived.Trigger inputBuffer.[0])
-    byteReceived.Publish.Add
+    let writeBytes (byteArray: byte array) =
+        src.Write(byteArray, 0, byteArray.Length)
+
+    byteReceived.Publish.Add, writeBytes, Some(src :> IDisposable)
 
 let fakeConnection() =
-    Event<byte>().Publish.Add
+    let writeBytes _ = ()
+    Event<byte>().Publish.Add, writeBytes, None
 
 type ConnectionType =
 | Real of string
