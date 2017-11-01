@@ -15,6 +15,7 @@ let realConnection port =
     let writeBytes (byteArray: byte array) =
         printfn "Writing Bytes: %A" byteArray
         src.Write(byteArray, 0, byteArray.Length)
+        src.Flush()
 
     byteReceived.Publish.Add, writeBytes, Some(src :> IDisposable)
 
