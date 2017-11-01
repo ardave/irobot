@@ -18,6 +18,9 @@ let main argv =
         | ConsoleKey.DownArrow -> 
             writeBytes [|137uy; 0uy; 50uy; 0uy; 0uy|]
             monitorKeyboardInput()
+        | ConsoleKey.RightArrow ->
+            writeBytes [|128uy|]
+            monitorKeyboardInput()
         | _ -> 
             messageAgent.Post <| UserKeyPress(keyInfo)
             monitorKeyboardInput()
