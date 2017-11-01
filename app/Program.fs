@@ -8,6 +8,7 @@ let main argv =
 
     let br, writeBytes, disposableOpt = byteReceived (Real("/dev/ttyUSB0"))
     br (messageAgent.Post << ByteReceivedFromRobot)
+    System.Threading.Thread.Sleep(TimeSpan.FromSeconds(1.))
     writeBytes[|128uy|]
    
     let rec monitorKeyboardInput() =
