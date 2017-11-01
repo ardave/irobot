@@ -14,7 +14,9 @@ let main argv =
         let keyInfo = Console.ReadKey()
         match keyInfo.Key with
         | ConsoleKey.Q -> printfn "Cancel key pressed."
-        | ConsoleKey.DownArrow -> writeBytes [|137uy; 0uy; 50uy; 0uy; 0uy|]
+        | ConsoleKey.DownArrow -> 
+            writeBytes [|137uy; 0uy; 50uy; 0uy; 0uy|]
+            monitorKeyboardInput()
         | _ -> 
             messageAgent.Post <| UserKeyPress(keyInfo)
             monitorKeyboardInput()
