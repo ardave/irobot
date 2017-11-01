@@ -57,5 +57,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\core\core.fsproj">
+      <Project>{47FA99EA-5676-40E2-9C02-9A5E161238AD}</Project>
+      <Name>core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(FSharpTargetsPath)" />
 </Project>

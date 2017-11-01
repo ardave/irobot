@@ -1,35 +1,24 @@
 ﻿open System
 open MessageAgent
+open iRobot
 open iRobot.Comms
 
 [<EntryPoint>]
-let main argv = 
+let main _ = 
     let messageAgent = createMessageAgent()
 
-    let br, writeBytes, disposableOpt = byteReceived (Real("/dev/ttyUSB0"))
-    br (messageAgent.Post << ByteReceivedFromRobot)
-    System.Threading.Thread.Sleep(TimeSpan.FromSeconds(1.))
-    writeBytes[|128uy|]
-   
+    let byteReceived, _, disposableOpt = createConnection (Real("/dev/ttyUSB0"))
+    byteReceived (messageAgent.Post << ByteReceivedFromRobot)
+
     let rec monitorKeyboardInput() =
         let keyInfo = Console.ReadKey()
         match keyInfo.Key with
-        | ConsoleKey.Q -> printfn "Cancel key pressed."
-        | ConsoleKey.DownArrow -> 
-            writeBytes [|137uy; 255uy; 56uy; 1uy; 244uy|]
-            monitorKeyboardInput()
-        | ConsoleKey.RightArrow ->
-            writeBytes [|128uy|]
-            monitorKeyboardInput()
-        | ConsoleKey.LeftArrow ->
-            writeBytes [|7uy|]
-            monitorKeyboardInput()
-        | ConsoleKey.UpArrow ->
-            writeBytes [|131uy|]
-            monitorKeyboardInput()
+        | ConsoleKey.Q ->
+            printfn "Cancel key pressed."
         | _ -> 
             messageAgent.Post <| UserKeyPress(keyInfo)
             monitorKeyboardInput()
+
     monitorKeyboardInput()
     match disposableOpt with | Some d -> d.Dispose() | None -> ()
     0

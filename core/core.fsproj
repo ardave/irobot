@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="BitStuff.fs" />
     <Compile Include="ComputationExpressions.fs" />
     <Compile Include="UnitsOfMeasure.fs" />
     <Compile Include="BaudRate.fs" />
@@ -60,10 +61,10 @@
     <Compile Include="OperatingMode.fs" />
     <Compile Include="SensorData.fs" />
     <Compile Include="GroupPacketParser.fs" />
-    <Compile Include="Roomba.fs" />
-    <Compile Include="ActuatorCommand.fs" />
-    <Compile Include="CleaningMode.fs" />
     <Compile Include="Command.fs" />
+    <Compile Include="ActuatorCommand.fs" />
+    <Compile Include="Roomba.fs" />
+    <Compile Include="CleaningMode.fs" />
     <Compile Include="InputCommand.fs" />
     <Compile Include="Program.fs" />
     <None Include="packages.config" />

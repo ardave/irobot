@@ -2,6 +2,7 @@
 
 open System
 open RJCP.IO.Ports
+open iRobot
 
 let realConnection port =
     let byteReceived = new Event<byte>()
@@ -9,12 +10,12 @@ let realConnection port =
     let src = new SerialPortStream(port, 115200, 8, Parity.None, StopBits.One, ReceivedBytesThreshold = 1)
     src.Open()
     src.DataReceived.Add
-        (fun a ->
+        (fun _ ->
             src.Read(inputBuffer, 0, 1) |> ignore
             byteReceived.Trigger inputBuffer.[0])
-    let writeBytes (byteArray: byte array) =
-        printfn "Writing Bytes: %A" byteArray
-        src.Write(byteArray, 0, byteArray.Length)
+    let writeBytes commandData =
+        printfn "Writing opcode %i: %A" commandData.OpCode commandData.DataBytes
+        src.Write(commandData.DataBytes, 0, commandData.DataBytes.Length)
         src.Flush()
 
     byteReceived.Publish.Add, writeBytes, Some(src :> IDisposable)
@@ -27,7 +28,7 @@ type ConnectionType =
 | Real of string
 | Fake
 
-let byteReceived connectionType =
+let createConnection connectionType =
     match connectionType with 
     | Real dev -> realConnection dev
     | Fake -> fakeConnection()
