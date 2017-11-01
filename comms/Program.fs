@@ -6,7 +6,7 @@ open RJCP.IO.Ports
 let realConnection port =
     let byteReceived = new Event<byte>()
     let inputBuffer = [|0uy|]
-    let src = new SerialPortStream(port, ReceivedBytesThreshold = 1)
+    let src = new SerialPortStream(port, 115200, 8, Parity.None, StopBits.One, ReceivedBytesThreshold = 1)
     src.Open()
     src.DataReceived.Add
         (fun a ->
