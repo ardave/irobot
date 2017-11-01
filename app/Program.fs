@@ -16,7 +16,7 @@ let main argv =
         match keyInfo.Key with
         | ConsoleKey.Q -> printfn "Cancel key pressed."
         | ConsoleKey.DownArrow -> 
-            writeBytes [|137uy; 0uy; 50uy; 0uy; 0uy|]
+            writeBytes [|137uy; 255uy; 56uy; 1uy; 244uy|]
             monitorKeyboardInput()
         | ConsoleKey.RightArrow ->
             writeBytes [|128uy|]
