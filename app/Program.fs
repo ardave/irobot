@@ -4,21 +4,25 @@ open iRobot
 open iRobot.Comms
 
 [<EntryPoint>]
-let main _ = 
+let main _ =     
     let messageAgent = createMessageAgent()
 
+
     let byteReceived, _, disposableOpt = createConnection (Real("/dev/ttyUSB0"))
-    byteReceived (messageAgent.Post << ByteReceivedFromRobot)
+    try
+        byteReceived (messageAgent.Post << ByteReceivedFromRobot)
 
-    let rec monitorKeyboardInput() =
-        let keyInfo = Console.ReadKey()
-        match keyInfo.Key with
-        | ConsoleKey.Q ->
-            printfn "Cancel key pressed."
-        | _ -> 
-            messageAgent.Post <| UserKeyPress(keyInfo)
-            monitorKeyboardInput()
+        let rec monitorKeyboardInput() =
+            let keyInfo = Console.ReadKey()
+            match keyInfo.Key with
+            | ConsoleKey.Q ->
+                printfn "Cancel key pressed."
+            | _ -> 
+                messageAgent.Post <| UserKeyPress(keyInfo)
+                monitorKeyboardInput()
 
-    monitorKeyboardInput()
-    match disposableOpt with | Some d -> d.Dispose() | None -> ()
+        monitorKeyboardInput()
+    finally
+        match disposableOpt with | Some d -> d.Dispose() | None -> ()
+    
     0
