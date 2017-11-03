@@ -24,8 +24,8 @@ module Actuation =
 
     let getDriveBytes velocity radius =
         let velocityBytes =
-            velocity
-            |> (/) 1<velocity>
+            1<velocity>
+            |> (/) velocity
             |> BitStuff.intToTwosComplementBytes
         let radiusBytes =
             match radius with 

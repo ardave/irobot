@@ -1,5 +1,7 @@
-﻿[<EntryPoint>]
+﻿open iRobot
+
+[<EntryPoint>]
 let main argv =
-    let bytes = BitStuff.intToTwosComplementBytes 25
-    printfn "Bytes: %A" bytes
+    let v = 25<velocity>
+    printfn "%A" <| (/) 1<velocity> 25<velocity>
     0
