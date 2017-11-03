@@ -4,9 +4,9 @@ open iRobot
 open iRobot.Comms
 
 [<EntryPoint>]
-let main _ =     
+let main _ =
+    printfn "Starting ..."
     let messageAgent = createMessageAgent()
-
 
     let byteReceived, _, disposableOpt = createConnection (Real("/dev/ttyUSB0"))
     try
@@ -18,6 +18,7 @@ let main _ =
             | ConsoleKey.Q ->
                 printfn "Cancel key pressed."
             | _ -> 
+                printfn "Pressed: %c" <| keyInfo.KeyChar
                 messageAgent.Post <| UserKeyPress(keyInfo)
                 monitorKeyboardInput()
 

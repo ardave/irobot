@@ -5,6 +5,7 @@ open RJCP.IO.Ports
 open iRobot
 
 let realConnection port =
+    printfn "Opening connection to %s ..." port
     let byteReceived = new Event<byte>()
     let inputBuffer = [|0uy|]
     let src = new SerialPortStream(port, 115200, 8, Parity.None, StopBits.One, ReceivedBytesThreshold = 1)
