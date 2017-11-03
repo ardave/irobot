@@ -20,24 +20,23 @@ module Actuation =
     | Straight 
     | TurnInPlaceClockwise
     | TurnInPlaceCounterclockwise
-    | Radius of int<mm>
+    | ArbitraryRadius of int<mm>
 
     let getDriveBytes velocity radius =
         let velocityBytes =
-            1<velocity>
-            |> (/) velocity
+            velocity / 1<velocity>
             |> BitStuff.intToTwosComplementBytes
         let radiusBytes =
             match radius with 
             | Straight                    -> 32768 |> BitStuff.intToTwosComplementBytes
-            | TurnInPlaceClockwise        -> -1    |> BitStuff.intToTwosComplementBytes
-            | TurnInPlaceCounterclockwise -> 1     |> BitStuff.intToTwosComplementBytes
-            | Radius mm                   -> mm    |> (/) 1<mm> |> BitStuff.intToTwosComplementBytes
+            | TurnInPlaceClockwise        ->    -1 |> BitStuff.intToTwosComplementBytes
+            | TurnInPlaceCounterclockwise ->     1 |> BitStuff.intToTwosComplementBytes
+            | ArbitraryRadius mm          ->    mm |> (/) 1<mm> |> BitStuff.intToTwosComplementBytes
         Array.append velocityBytes radiusBytes
         |> printfn "Drive bytes: %A"
         Array.append velocityBytes radiusBytes
         
-    let getDriveCommand velocity radius =
+    let createDriveCommand velocity radius =
         let dataBytes = getDriveBytes velocity radius
         { OpCode = 137uy; DataBytes = dataBytes }
 

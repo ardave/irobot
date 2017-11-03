@@ -11,5 +11,5 @@ type OperatingMode =
 | Safe of CommandData
 | Full of CommandData
 
-let createSafe = { OpCode = 131uy; DataBytes = Array.empty }
+let createSafe = Safe <| { OpCode = 131uy; DataBytes = Array.empty }
 let createFull = Full <| { OpCode = 132uy; DataBytes = Array.empty }

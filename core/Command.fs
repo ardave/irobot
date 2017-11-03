@@ -5,7 +5,7 @@ open OperatingMode
 
 // Pg 6 at the top suggests that this type of command might be 
 // different from the CleaningModeCommand
-type Command =
+type GettingStartedCommand =
 | Start
 | Reset
 | Stop

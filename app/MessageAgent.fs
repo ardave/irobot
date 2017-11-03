@@ -2,7 +2,6 @@ module MessageAgent
 
 open System
 open iRobot
-open iRobot.Comms
 
 type Message = 
 | UserKeyPress of ConsoleKeyInfo
@@ -23,7 +22,7 @@ let createMessageAgent(writeBytes) =
             | ConsoleKey.F        -> roomba <- Roomba.safe  roomba
             | ConsoleKey.Spacebar -> roomba <- Roomba.stop  roomba
             | ConsoleKey.R        -> roomba <- Roomba.reset roomba
-            | ConsoleKey.UpArrow  -> roomba <- Roomba.moveForward 25<mm/second> roomba
+            | ConsoleKey.UpArrow  -> roomba <- Roomba.drive 25<mm/second> Actuation.Straight roomba
             | _ -> ()
         | ByteReceivedFromRobot b ->
             printfn "%i received." b
