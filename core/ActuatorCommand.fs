@@ -23,6 +23,8 @@ module Actuation =
     | Radius of int<mm>
 
     let getDriveBytes velocity radius =
+        printfn "Velocity: %A" velocity
+        printfn "Velocity int: %A" <| velocity / 1<velocity>
         let velocityBytes =
             velocity
             |> (/) 1<velocity>
