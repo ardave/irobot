@@ -15,8 +15,9 @@ let realConnection port =
             src.Read(inputBuffer, 0, 1) |> ignore
             byteReceived.Trigger inputBuffer.[0])
     let writeBytes commandData =
-        printfn "Writing opcode %i: %A" commandData.OpCode commandData.DataBytes
-        src.Write(commandData.DataBytes, 0, commandData.DataBytes.Length)
+        let allBytes = Array.append [|commandData.OpCode|] commandData.DataBytes
+        printfn "Writing bytes: %A" allBytes
+        src.Write(allBytes, 0, commandData.DataBytes.Length)
         src.Flush()
 
     byteReceived.Publish.Add, writeBytes, Some(src :> IDisposable)
