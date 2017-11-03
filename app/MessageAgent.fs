@@ -20,6 +20,7 @@ let createMessageAgent(writeBytes) =
             printfn "Processing: %c" <| keyInfo.KeyChar
             match keyInfo.Key with
             | ConsoleKey.S        -> roomba <- Roomba.start roomba
+            | ConsoleKey.F        -> roomba <- Roomba.safe  roomba
             | ConsoleKey.Spacebar -> roomba <- Roomba.stop  roomba
             | ConsoleKey.R        -> roomba <- Roomba.reset roomba
             | ConsoleKey.UpArrow  -> roomba <- Roomba.moveForward 25<mm/second> roomba

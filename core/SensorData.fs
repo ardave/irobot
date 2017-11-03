@@ -264,7 +264,7 @@ let parseOIMode b =
     match int b with
     | 0 -> OperatingMode.Off
     | 1 -> OperatingMode.Passive
-    | 2 -> OperatingMode.createSafe
+    // | 2 -> OperatingMode.createSafe
     | 3 -> OperatingMode.createFull
     | _ -> failwith "Unrecognized OI/Operating Mode"
     

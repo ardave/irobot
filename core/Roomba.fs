@@ -33,12 +33,20 @@ module Roomba =
         |> roomba.SendCommand
         roomba
 
+    let private sendModeCommand modeCommand roomba = 
+        modeCommand
+        |> roomba.SendCommand
+
     let start roomba = sendCommand Start Array.empty roomba
     let stop  roomba = sendCommand Stop  Array.empty roomba
     let reset roomba = sendCommand Reset Array.empty roomba
 
     let setBaudRate (baudRate:BaudRate) roomba =
         sendCommand Baud [|byte baudRate|] roomba
+
+    let safe roomba =
+        sendModeCommand OperatingMode.createSafe roomba
+        roomba
 
     let moveForward velocity roomba =
         // Actuation.getDriveCommand velocity Actuation.Straight
