@@ -41,7 +41,8 @@ module Roomba =
         sendCommand Baud [|byte baudRate|] roomba
 
     let moveForward velocity roomba =
-        Actuation.getDriveCommand velocity Actuation.Straight
+        // Actuation.getDriveCommand velocity Actuation.Straight
+        {OpCode = 137uy; DataBytes =  [|255uy; 56uy; 1uy; 244uy|] }
         |> roomba.SendCommand 
         roomba
 

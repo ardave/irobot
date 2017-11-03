@@ -18,7 +18,6 @@ let main _ =
             | ConsoleKey.Q ->
                 printfn "Cancel key pressed."
             | _ -> 
-                printfn "Initial press: %c" <| keyInfo.KeyChar
                 messageAgent.Post <| UserKeyPress(keyInfo)
                 monitorKeyboardInput()
 
