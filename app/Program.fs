@@ -6,9 +6,9 @@ open iRobot.Comms
 [<EntryPoint>]
 let main _ =
     printfn "Starting ..."
-    let messageAgent = createMessageAgent()
+    let byteReceived, writeBytes, disposableOpt = createConnection (Real("/dev/ttyUSB0"))
+    let messageAgent = createMessageAgent(writeBytes)
 
-    let byteReceived, _, disposableOpt = createConnection (Real("/dev/ttyUSB0"))
     try
         byteReceived (messageAgent.Post << ByteReceivedFromRobot)
 

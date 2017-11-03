@@ -8,11 +8,9 @@ type Message =
 | UserKeyPress of ConsoleKeyInfo
 | ByteReceivedFromRobot of byte
 
-let br, writeBytes, disposableOpt = createConnection (Real("/dev/ttyUSB0"))
+let createMessageAgent(writeBytes) =
+    let mutable roomba = Roomba.createDefault writeBytes
 
-let mutable roomba = Roomba.createDefault writeBytes
-
-let createMessageAgent() =
     MailboxProcessor.Start(fun inbox->
     let rec messageLoop() = async {
         let! msg = inbox.Receive()
