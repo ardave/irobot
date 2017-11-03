@@ -19,7 +19,7 @@ let createMessageAgent() =
         
         match msg with
         | UserKeyPress keyInfo ->
-            printfn "Pressed: %c" <| keyInfo.KeyChar
+            printfn "Processing: %c" <| keyInfo.KeyChar
             match keyInfo.Key with
             | ConsoleKey.S        -> roomba <- Roomba.start roomba
             | ConsoleKey.Spacebar -> roomba <- Roomba.stop  roomba
