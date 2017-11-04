@@ -7,13 +7,15 @@ open iRobot
 let realConnection port =
     printfn "Opening connection to %s ..." port
     let byteReceived = new Event<byte>()
-    let inputBuffer = [|0uy|]
     let src = new SerialPortStream(port, 115200, 8, Parity.None, StopBits.One, ReceivedBytesThreshold = 1)
     src.Open()
     src.DataReceived.Add
         (fun _ ->
-            src.Read(inputBuffer, 0, 1) |> ignore
-            byteReceived.Trigger inputBuffer.[0])
+            let byteCount = src.BytesToRead
+            let inputBuffer = Array.create byteCount 0uy
+            src.Read(inputBuffer, 0, byteCount) |> ignore
+            inputBuffer |> Array.iter byteReceived.Trigger
+        )
     let writeBytes commandData =
         let allBytes = Array.append [|commandData.OpCode|] commandData.DataBytes
         printfn "Writing bytes: %A" allBytes
