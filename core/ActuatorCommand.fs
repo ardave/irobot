@@ -33,8 +33,6 @@ module Actuation =
             | TurnInPlaceCounterclockwise ->     1 |> BitStuff.intToTwosComplementBytes
             | ArbitraryRadius mm          -> 1<mm> |> (/) mm |> BitStuff.intToTwosComplementBytes
         Array.append velocityBytes radiusBytes
-        |> printfn "Drive bytes: %A"
-        Array.append velocityBytes radiusBytes
         
     let createDriveCommand velocity radius =
         let dataBytes = getDriveBytes velocity radius

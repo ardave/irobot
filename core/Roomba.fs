@@ -54,11 +54,13 @@ module Roomba =
 
     let safe roomba =
         sendModeCommand OperatingMode.createSafe roomba
-        roomba
+        { roomba with OperatingMode = OperatingMode.createSafe }
 
     let drive velocity radius roomba =
         roomba.SendCommand <| Actuation.createDriveCommand velocity radius
         { roomba with CurrentDriveState = velocity, radius }
+
+    let getMode roomba = roomba.SendCommand <| { OpCode = 142uy; DataBytes = [|6uy|] }
 
     let processByte b roomba =
         roomba.ReceivedByteLog.Enqueue({ Byte = b; ReceivedAt = DateTime.Now - startTime })
