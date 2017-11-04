@@ -23,6 +23,8 @@ module Actuation =
     | ArbitraryRadius of int<mm>
 
     let getDriveBytes velocity radius =
+        printfn "Velocity: %A" velocity
+        printfn "Velocity div: %A" <| velocity / 1<velocity>
         let velocityBytes =
             velocity / 1<velocity>
             |> BitStuff.intToTwosComplementBytes
