@@ -15,6 +15,7 @@ type Roomba = {
     SendCommand       : CommandData -> unit
     ReceivedByteLog   : Queue<ReceivedByte>
     CurrentDriveState : int<velocity> * Radius
+    Started           : bool
 }
 
 module Roomba =
@@ -26,6 +27,7 @@ module Roomba =
             SendCommand       = writeBytes
             ReceivedByteLog   = Queue<ReceivedByte>()
             CurrentDriveState = 0<velocity>, ArbitraryRadius(0<mm>)
+            Started           = false
         }
 
     let private sendCommand command dataBytes roomba =
@@ -55,10 +57,8 @@ module Roomba =
         roomba
 
     let drive velocity radius roomba =
-        let currentVelocity = fst roomba.CurrentDriveState
-        let newVelocity = if currentVelocity > 0<velocity> then 0<velocity> else velocity
-        roomba.SendCommand <| Actuation.createDriveCommand newVelocity radius
-        { roomba with CurrentDriveState = newVelocity, radius }
+        roomba.SendCommand <| Actuation.createDriveCommand velocity radius
+        { roomba with CurrentDriveState = velocity, radius }
 
     let processByte b roomba =
         roomba.ReceivedByteLog.Enqueue({ Byte = b; ReceivedAt = DateTime.Now - startTime })

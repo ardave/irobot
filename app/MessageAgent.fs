@@ -18,11 +18,14 @@ let createMessageAgent(writeBytes) =
         | UserKeyPress keyInfo ->
             printfn "Processing: %c" <| keyInfo.KeyChar
             match keyInfo.Key with
-            | ConsoleKey.S        -> roomba <- Roomba.start roomba
-            | ConsoleKey.F        -> roomba <- Roomba.safe  roomba
-            | ConsoleKey.Spacebar -> roomba <- Roomba.stop  roomba
-            | ConsoleKey.R        -> roomba <- Roomba.reset roomba
-            | ConsoleKey.UpArrow  -> roomba <- Roomba.drive 25<mm/second> Actuation.Straight roomba
+            | ConsoleKey.S          -> roomba <- Roomba.start roomba
+            | ConsoleKey.F          -> roomba <- Roomba.safe  roomba
+            | ConsoleKey.Spacebar   -> roomba <- Roomba.stop  roomba
+            | ConsoleKey.R          -> roomba <- Roomba.reset roomba
+            | ConsoleKey.P          -> roomba <- Roomba.drive   0<mm/second> Actuation.Straight roomba
+            | ConsoleKey.UpArrow    -> roomba <- Roomba.drive 100<mm/second> Actuation.Straight roomba
+            | ConsoleKey.LeftArrow  -> roomba <- Roomba.drive 100<mm/second> Actuation.TurnInPlaceCounterclockwise roomba
+            | ConsoleKey.RightArrow -> roomba <- Roomba.drive 100<mm/second> Actuation.TurnInPlaceClockwise roomba
             | _ -> ()
         | ByteReceivedFromRobot b ->
             printfn "%i received." b
