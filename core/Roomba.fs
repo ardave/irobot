@@ -55,7 +55,8 @@ module Roomba =
         roomba
 
     let drive velocity radius roomba =
-        let newVelocity = if velocity > 0<velocity> then 0<velocity> else velocity
+        let currentVelocity = fst roomba.CurrentDriveState
+        let newVelocity = if currentVelocity > 0<velocity> then 0<velocity> else velocity
         roomba.SendCommand <| Actuation.createDriveCommand newVelocity radius
         { roomba with CurrentDriveState = newVelocity, radius }
 
