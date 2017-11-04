@@ -10,11 +10,21 @@ type ReceivedByte = {
     ReceivedAt : TimeSpan
 }
 
+type PacketGroup = 
+| Group6
+
+type PacketExpectation = {
+    BytesReceived : byte list
+    BytesExpected : int
+    PacketGroup   : PacketGroup
+}
+
 type Roomba = {
     OperatingMode     : OperatingMode
     SendCommand       : CommandData -> unit
     ReceivedByteLog   : Queue<ReceivedByte>
-    CurrentDriveState : int<velocity> * Radius
+    ReceivedByteQueue : Queue<byte>
+    PacketExpectation : PacketExpectation option
     Started           : bool
 }
 
@@ -26,7 +36,8 @@ module Roomba =
             OperatingMode     = Off
             SendCommand       = writeBytes
             ReceivedByteLog   = Queue<ReceivedByte>()
-            CurrentDriveState = 0<velocity>, ArbitraryRadius(0<mm>)
+            ReceivedByteQueue = Queue<byte>()
+            PacketExpectation = None
             Started           = false
         }
 
@@ -38,8 +49,7 @@ module Roomba =
         |> roomba.SendCommand
         roomba
 
-    let private sendModeCommand modeCommand roomba = 
-        match modeCommand with
+    let private sendModeCommand roomba = function
         | Safe commandData | Full commandData -> 
             commandData |> roomba.SendCommand
         | _ -> 
@@ -53,18 +63,34 @@ module Roomba =
         sendCommand Baud [|byte baudRate|] roomba
 
     let safe roomba =
-        sendModeCommand OperatingMode.createSafe roomba
+        sendModeCommand roomba OperatingMode.createSafe
         { roomba with OperatingMode = OperatingMode.createSafe }
 
     let drive velocity radius roomba =
         roomba.SendCommand <| Actuation.createDriveCommand velocity radius
-        { roomba with CurrentDriveState = velocity, radius }
+        roomba
 
-    let getMode roomba = roomba.SendCommand <| { OpCode = 142uy; DataBytes = [|6uy|] }
+    let getMode roomba = 
+        roomba.SendCommand <| { OpCode = 142uy; DataBytes = [|6uy|] }
+        let expectation = Some { BytesReceived = []; BytesExpected = 52; PacketGroup = Group6 }
+        { roomba with PacketExpectation = expectation }
 
-    let processByte b roomba =
+    let private logByte b roomba =
         roomba.ReceivedByteLog.Enqueue({ Byte = b; ReceivedAt = DateTime.Now - startTime })
         if roomba.ReceivedByteLog.Count > 16483 then
             for _ in [0..100] do 
                 roomba.ReceivedByteLog.Dequeue() |> ignore
-        roomba
+
+    let processByte b roomba =
+        logByte b roomba
+        let updatedExpectation =
+            match roomba.PacketExpectation with
+            | Some e -> 
+                Some(
+                    { e with 
+                        BytesExpected = e.BytesExpected - 1
+                        BytesReceived = b::e.BytesReceived
+                    }
+                )
+            | None -> None
+        { roomba with PacketExpectation = updatedExpectation }

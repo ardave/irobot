@@ -8,6 +8,8 @@ type Message =
 | ByteReceivedFromRobot of byte
 
 let createMessageAgent(writeBytes) =
+    // One bit of mutable state at the top of the application,
+    // that I suppose I've got to hold somewhere:
     let mutable roomba = Roomba.createDefault writeBytes
 
     MailboxProcessor.Start(fun inbox->
@@ -18,7 +20,7 @@ let createMessageAgent(writeBytes) =
         | UserKeyPress keyInfo ->
             printfn "Processing: %c" <| keyInfo.KeyChar
             match keyInfo.Key with
-            | ConsoleKey.M          -> Roomba.getMode roomba
+            | ConsoleKey.M          -> roomba <- Roomba.getMode roomba
             | ConsoleKey.S          -> roomba <- Roomba.start roomba
             | ConsoleKey.F          -> roomba <- Roomba.safe  roomba
             | ConsoleKey.Spacebar   -> roomba <- Roomba.stop  roomba
