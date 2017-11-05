@@ -97,6 +97,12 @@ type SensorData = {
     LeftEncoderCounts            : int option
     RightEncoderCounts           : int option
     LightBumper                  : LightBumper option
+    LightBumpLeftSignal          : int option
+    LightBumpFrontLeftSignal     : int option
+    LightBumpCenterLeftSignal    : int option
+    LightBumpCenterRightSignal   : int option
+    LightBumpFrontRightSignal    : int option
+    LightBumpRightSignal         : int option
     LeftMotorCurrent             : int<mA> option
     RightMotorCurrent            : int<mA> option
     MainBrushMotorCurrent        : int<mA> option
@@ -143,6 +149,12 @@ let defaultSensorData = {
     LeftEncoderCounts            = None
     RightEncoderCounts           = None
     LightBumper                  = None
+    LightBumpLeftSignal          = None
+    LightBumpFrontLeftSignal     = None
+    LightBumpCenterLeftSignal    = None
+    LightBumpCenterRightSignal   = None
+    LightBumpFrontRightSignal    = None
+    LightBumpRightSignal         = None
     LeftMotorCurrent             = None
     RightMotorCurrent            = None
     MainBrushMotorCurrent        = None
@@ -152,10 +164,6 @@ let defaultSensorData = {
 
 type PacketGroup = 
 | Group100
-
-
-        
-
 
 let parseTwoByteWord opName byteArray =
     // I do not think I have yet accounted for the possibility of the result

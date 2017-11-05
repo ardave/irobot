@@ -2,6 +2,7 @@ namespace iRobot
 
 open System
 open System.Collections.Generic
+open System.Diagnostics
 open Sensors
 open OperatingMode
 
@@ -14,6 +15,7 @@ type PacketExpectation = {
     BytesReceived : byte list
     BytesExpected : int
     PacketGroup   : PacketGroup
+    Stopwatch     : Stopwatch
 }
 
 type Roomba = {
@@ -66,9 +68,9 @@ module Roomba =
         roomba.SendCommand <| Actuation.createDriveCommand velocity radius
         roomba
 
-    let getMode roomba = 
+    let readSensors roomba = 
         roomba.SendCommand <| { OpCode = 142uy; DataBytes = [|100uy|] }
-        let expectation = Some { BytesReceived = []; BytesExpected = 80; PacketGroup = Group100 }
+        let expectation = Some { BytesReceived = []; BytesExpected = 80; PacketGroup = Group100; Stopwatch = Stopwatch.StartNew() }
         { roomba with PacketExpectation = expectation }
 
     let private logByte b roomba =
@@ -84,7 +86,8 @@ module Roomba =
             | Some e ->
                 match e.BytesExpected with 
                 | 1 ->
-                    let sdResult = PacketGroupParsing.parsePacketGroup e.BytesReceived e.PacketGroup
+                    let sdResult = PacketGroupParsing.parsePacketGroup (b::e.BytesReceived) e.PacketGroup
+                    printfn "Retrieved sensor data in %i ms." e.Stopwatch.ElapsedMilliseconds
                     match sdResult with 
                     | Ok sensorData -> SensorDataPrinting.print sensorData
                     | Error msg -> printfn "%s" msg
