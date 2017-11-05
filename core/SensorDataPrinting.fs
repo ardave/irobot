@@ -22,7 +22,10 @@ let printLightBumpCenterRightSignal s = printfn "Light Bump Center Right: %i" s
 let printLightBumpFrontRightSignal s = printfn "Light Bump Front Right: %i" s
 let printLightBumpRightSignal s = printfn "Light Bump Right: %i" s
 
+let printBatteryCharge s = printfn "Battery Charge: %A" s
+
 let print sensorData = 
+    printfn "******************************"
     sensorData.BumpDrop |> Option.iter printBumpDrop
     sensorData.Wall |> Option.iter printWall
     sensorData.WallSignal |> Option.iter printWallSignal
@@ -30,6 +33,7 @@ let print sensorData =
     sensorData.CliffFrontLeftSignal |> Option.iter printCliffFrontLeftSignal
     sensorData.CliffFrontRightSignal |> Option.iter printCliffFrontRightSignal
     sensorData.CliffRightSignal |> Option.iter printCliffRightSignal
+    sensorData.BatteryCharge |> Option.iter printBatteryCharge
     sensorData.LightBumpLeftSignal |> Option.iter printLightBumpLeftSignal
     sensorData.LightBumpFrontLeftSignal |> Option.iter printLightBumpFrontLeftSignal
     sensorData.LightBumpCenterLeftSignal |> Option.iter printLightBumpCenterLeftSignal

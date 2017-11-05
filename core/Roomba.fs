@@ -76,7 +76,6 @@ module Roomba =
         if roomba.ReceivedByteLog.Count > 16483 then
             for _ in [0..100] do 
                 roomba.ReceivedByteLog.Dequeue() |> ignore
-
     let processByte b roomba =
         logByte b roomba
         let updatedExpectation =

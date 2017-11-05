@@ -1,6 +1,7 @@
 module PacketGroupParsing
 
 open BitStuff
+open iRobot
 open Sensors
 
 let private parseBumpsWheeldrops b =
@@ -38,6 +39,7 @@ let parsePacketGroup byteList = function
                         CliffFrontLeftSignal = Some(hiLoBytetoInt ba.[30..31])
                         CliffFrontRightSignal = Some(hiLoBytetoInt ba.[32..33])
                         CliffRightSignal = Some(hiLoBytetoInt ba.[34..35])
+                        BatteryCharge = Some((hiLoBytetoInt ba.[22..23]) * 1<mAh>)
                         LightBumpLeftSignal          = Some(hiLoBytetoInt ba.[57..58])
                         LightBumpFrontLeftSignal           = Some(hiLoBytetoInt ba.[59..60])
                         LightBumpCenterLeftSignal          = Some(hiLoBytetoInt ba.[61..62])
