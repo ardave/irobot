@@ -7,6 +7,8 @@ Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "comms", "comms\comms.fsproj
 EndProject
 Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "app", "app\app.fsproj", "{7FB53AD2-F330-40A2-A707-7AEABA02CBDC}"
 EndProject
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "Tests", "Tests\Tests.fsproj", "{95DCCF29-2952-48C4-BED2-97F0BD0EAD8C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -25,5 +27,9 @@ Global
 		{7FB53AD2-F330-40A2-A707-7AEABA02CBDC}.Debug|x86.Build.0 = Debug|x86
 		{7FB53AD2-F330-40A2-A707-7AEABA02CBDC}.Release|x86.ActiveCfg = Release|x86
 		{7FB53AD2-F330-40A2-A707-7AEABA02CBDC}.Release|x86.Build.0 = Release|x86
+		{95DCCF29-2952-48C4-BED2-97F0BD0EAD8C}.Debug|x86.ActiveCfg = Debug|x86
+		{95DCCF29-2952-48C4-BED2-97F0BD0EAD8C}.Debug|x86.Build.0 = Debug|x86
+		{95DCCF29-2952-48C4-BED2-97F0BD0EAD8C}.Release|x86.ActiveCfg = Release|x86
+		{95DCCF29-2952-48C4-BED2-97F0BD0EAD8C}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 EndGlobal

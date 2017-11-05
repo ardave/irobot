@@ -39,14 +39,14 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.ValueTuple">
-      <HintPath>..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-    </Reference>
-    <Reference Include="FSharp.Core">
-      <HintPath>..\packages\FSharp.Core.4.1.0.2\lib\net45\FSharp.Core.dll</HintPath>
-    </Reference>
     <Reference Include="RJCP.SerialPortStream">
       <HintPath>..\packages\SerialPortStream.2.1.2\lib\net45\RJCP.SerialPortStream.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharp.Core">
+      <HintPath>..\packages\FSharp.Core.4.2.3\lib\net45\FSharp.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

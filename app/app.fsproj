@@ -40,21 +40,21 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.ValueTuple">
-      <HintPath>..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="FSharp.Core">
-      <HintPath>..\packages\FSharp.Core.4.1.0.2\lib\net45\FSharp.Core.dll</HintPath>
+      <HintPath>..\packages\FSharp.Core.4.2.3\lib\net45\FSharp.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="MessageAgent.fs" />
     <Compile Include="Program.fs" />
-    <None Include="packages.config" />
     <Content Include="libnserial.so.1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="packages.config" />
     <ProjectReference Include="..\comms\comms.fsproj">
       <Project>{27F48E4E-6F96-41CC-B5C6-69928C36CFAD}</Project>
       <Name>comms</Name>
