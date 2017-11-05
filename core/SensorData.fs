@@ -1,5 +1,6 @@
 module Sensors
 
+open BitStuff
 open iRobot
 
 type BumpDrop = {
@@ -149,8 +150,12 @@ let defaultSensorData = {
     Stasis                       = None
 }
 
-let inline isBitSet pos b =
-    b &&& (byte 1 <<< pos) <> byte 0
+type PacketGroup = 
+| Group100
+
+
+        
+
 
 let parseTwoByteWord opName byteArray =
     // I do not think I have yet accounted for the possibility of the result
@@ -163,6 +168,8 @@ let parseTwoByteWord opName byteArray =
         |> Ok
     | x -> 
         Error (sprintf "Expected %s to be 2-byte array, but length was %i" opName x)
+
+
 
 let parseBumpsWheeldrops b =
     {
@@ -295,5 +302,12 @@ let parseRequestedRightVelocity ba =
     match parseTwoByteWord "Requested Right Velocity" ba with
     | Ok number -> Ok(number * 1<mm>)
     | Error x -> Error(x)
+
+let parsePacketGroup (bytes: byte array) = function
+    | Group100 ->
+        {
+            defaultSensorData with
+                BumpDrop = Some(parseBumpsWheeldrops bytes.[0])
+        }
 
 

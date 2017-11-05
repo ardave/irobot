@@ -2,16 +2,13 @@ namespace iRobot
 
 open System
 open System.Collections.Generic
-open Actuation
+open Sensors
 open OperatingMode
 
 type ReceivedByte = {
     Byte       : byte
     ReceivedAt : TimeSpan
 }
-
-type PacketGroup = 
-| Group100
 
 type PacketExpectation = {
     BytesReceived : byte list
@@ -40,7 +37,6 @@ module Roomba =
             PacketExpectation = None
             Started           = false
         }
-
     let private sendCommand command dataBytes roomba =
         {
             OpCode    = CommandConstructors.getCommandOpCode command

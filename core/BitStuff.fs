@@ -13,3 +13,6 @@ let intToTwosComplementBytes i =
             |> (+) 1
     
     [| BitConverter.GetBytes(input).[1]; BitConverter.GetBytes(input).[0] |]
+
+let inline isBitSet pos b =
+    b &&& (byte 1 <<< pos) <> byte 0
