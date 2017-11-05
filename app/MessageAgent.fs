@@ -31,7 +31,7 @@ let createMessageAgent(writeBytes) =
             | ConsoleKey.RightArrow -> roomba <- Roomba.drive 100<mm/second> Actuation.TurnInPlaceClockwise roomba
             | _ -> ()
         | ByteReceivedFromRobot b ->
-            printfn "%i received." b
+            // printfn "%i received." b
             roomba <- Roomba.processByte b roomba
         
         return! messageLoop()

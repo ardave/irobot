@@ -1,6 +1,5 @@
 namespace iRobot
 
-open Communicator
 open OperatingMode
 
 // Pg 6 at the top suggests that this type of command might be 

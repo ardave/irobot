@@ -11,7 +11,7 @@ type ReceivedByte = {
 }
 
 type PacketGroup = 
-| Group6
+| Group100
 
 type PacketExpectation = {
     BytesReceived : byte list
@@ -71,8 +71,8 @@ module Roomba =
         roomba
 
     let getMode roomba = 
-        roomba.SendCommand <| { OpCode = 142uy; DataBytes = [|6uy|] }
-        let expectation = Some { BytesReceived = []; BytesExpected = 52; PacketGroup = Group6 }
+        roomba.SendCommand <| { OpCode = 142uy; DataBytes = [|100uy|] }
+        let expectation = Some { BytesReceived = []; BytesExpected = 80; PacketGroup = Group100 }
         { roomba with PacketExpectation = expectation }
 
     let private logByte b roomba =
@@ -85,12 +85,17 @@ module Roomba =
         logByte b roomba
         let updatedExpectation =
             match roomba.PacketExpectation with
-            | Some e -> 
-                Some(
-                    { e with 
-                        BytesExpected = e.BytesExpected - 1
-                        BytesReceived = b::e.BytesReceived
-                    }
-                )
-            | None -> None
+            | Some e ->
+                match e.BytesExpected with 
+                | 1 ->
+                    printfn "Received all expected bytes."
+                    None
+                | _ ->
+                    Some({ e with 
+                            BytesExpected = e.BytesExpected - 1
+                            BytesReceived = b::e.BytesReceived
+                        })
+            | None -> 
+                printf "%c" <| char b
+                None
         { roomba with PacketExpectation = updatedExpectation }
