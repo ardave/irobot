@@ -22,7 +22,6 @@ type Roomba = {
     OperatingMode     : OperatingMode
     SendCommand       : CommandData -> unit
     ReceivedByteLog   : Queue<ReceivedByte>
-    ReceivedByteQueue : Queue<byte>
     PacketExpectation : PacketExpectation option
     Started           : bool
 }
@@ -30,12 +29,11 @@ type Roomba = {
 module Roomba =
     let private startTime = DateTime.Now 
 
-    let createDefault writeBytes=
+    let createDefault writeBytes =
         { 
             OperatingMode     = Off
             SendCommand       = writeBytes
             ReceivedByteLog   = Queue<ReceivedByte>()
-            ReceivedByteQueue = Queue<byte>()
             PacketExpectation = None
             Started           = false
         }
