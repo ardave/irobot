@@ -169,18 +169,6 @@ let parseTwoByteWord opName byteArray =
     | x -> 
         Error (sprintf "Expected %s to be 2-byte array, but length was %i" opName x)
 
-
-
-let parseBumpsWheeldrops b =
-    {
-        BumpRight      = b |> isBitSet 0
-        BumpLeft       = b |> isBitSet 1
-        WheelDropRight = b |> isBitSet 2
-        WheelDropLeft  = b |> isBitSet 3
-    }
-
-let private firstBitOfByteToBool b = b |> isBitSet 0
-let parseWall = firstBitOfByteToBool
 let parseCliffLeft = firstBitOfByteToBool
 let parseCliffFrontLeft = firstBitOfByteToBool
 let parseCliffFrontRight = firstBitOfByteToBool
@@ -303,11 +291,5 @@ let parseRequestedRightVelocity ba =
     | Ok number -> Ok(number * 1<mm>)
     | Error x -> Error(x)
 
-let parsePacketGroup (bytes: byte array) = function
-    | Group100 ->
-        {
-            defaultSensorData with
-                BumpDrop = Some(parseBumpsWheeldrops bytes.[0])
-        }
 
 

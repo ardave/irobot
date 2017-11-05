@@ -84,7 +84,10 @@ module Roomba =
             | Some e ->
                 match e.BytesExpected with 
                 | 1 ->
-                    printfn "Received all expected bytes."
+                    let sdResult = PacketGroupParsing.parsePacketGroup e.BytesReceived e.PacketGroup
+                    match sdResult with 
+                    | Ok sensorData -> SensorDataPrinting.print sensorData
+                    | Error msg -> printfn "%s" msg
                     None
                 | _ ->
                     Some({ e with 

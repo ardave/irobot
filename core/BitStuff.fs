@@ -16,3 +16,5 @@ let intToTwosComplementBytes i =
 
 let inline isBitSet pos b =
     b &&& (byte 1 <<< pos) <> byte 0
+
+let firstBitOfByteToBool b = b |> isBitSet 0
