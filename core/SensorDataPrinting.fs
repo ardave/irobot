@@ -21,7 +21,6 @@ let printLightBumpCenterLeftSignal s = printfn "Light Bump Center Left: %i" s
 let printLightBumpCenterRightSignal s = printfn "Light Bump Center Right: %i" s
 let printLightBumpFrontRightSignal s = printfn "Light Bump Front Right: %i" s
 let printLightBumpRightSignal s = printfn "Light Bump Right: %i" s
-
 let printBatteryCharge s = printfn "Battery Charge: %A" s
 
 let print sensorData = 

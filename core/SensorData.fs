@@ -164,6 +164,7 @@ let defaultSensorData = {
 
 type PacketGroup = 
 | Group100
+| LightBumpSensors
 
 let parseTwoByteWord opName byteArray =
     // I do not think I have yet accounted for the possibility of the result

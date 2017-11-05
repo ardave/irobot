@@ -25,6 +25,7 @@ let createMessageAgent(writeBytes) =
             | ConsoleKey.F          -> roomba <- Roomba.safe        roomba
             | ConsoleKey.Spacebar   -> roomba <- Roomba.stop        roomba
             | ConsoleKey.R          -> roomba <- Roomba.reset       roomba
+            | ConsoleKey.X          -> roomba <- Roomba.beginStreaming roomba
             | ConsoleKey.P          -> roomba <- Roomba.drive    0<mm/second> Actuation.Straight roomba
             | ConsoleKey.UpArrow    -> roomba <- Roomba.drive  100<mm/second> Actuation.Straight roomba
             | ConsoleKey.DownArrow  -> roomba <- Roomba.drive -100<mm/second> Actuation.Straight roomba
