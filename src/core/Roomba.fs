@@ -102,48 +102,55 @@ module Roomba =
         roomba.SendCommand commandData
         { roomba with PacketExpectation = Some(createPacketExpectation 21 LightBumpSensors (Streaming(NotReceived))) }
 
+    let private parsePacketGroup e b=
+        let sensorDataResult = PacketGroupParsing.parsePacketGroup (b::e.BytesReceived) e.PacketGroup
+        
+        match sensorDataResult with 
+        | Ok sensorData -> 
+            match e.DataAcquisitionMode with 
+            | Streaming _ ->
+                printfn "Retrieved sensor data in %i ms." e.Stopwatch.ElapsedMilliseconds
+            | OneTime ->
+                SensorDataPrinting.print sensorData
+        | Error msg     -> 
+            printfn "%s" msg
+        match e.DataAcquisitionMode with 
+        | OneTime     -> None
+        | Streaming _ -> Some(createPacketExpectation e.TotalBytesExpected e.PacketGroup (Streaming(NotReceived)))
+
+    let private receiveIntermediateByte e b=
+        match e.DataAcquisitionMode with 
+        | Streaming preludeByte ->
+            match preludeByte, (int b) with 
+            | NotReceived, 19 ->
+                Some({ e with 
+                        BytesRemaining = e.BytesRemaining - 1
+                        BytesReceived = b::e.BytesReceived
+                        DataAcquisitionMode = Streaming Received
+                })
+            | NotReceived, _  -> Some e
+            | Received, _     ->
+                Some({ e with 
+                        BytesRemaining = e.BytesRemaining - 1
+                        BytesReceived = b::e.BytesReceived
+                })
+        | OneTime ->
+            Some({ e with 
+                    BytesRemaining = e.BytesRemaining - 1
+                    BytesReceived = b::e.BytesReceived
+                })
+
+    let private updateExpectation e b = 
+        match e.BytesRemaining with 
+        | 1 -> parsePacketGroup e b
+        | _ -> receiveIntermediateByte e b
+
     let processByte b roomba =
         logByte b roomba
         let updatedExpectation =
             match roomba.PacketExpectation with
             | Some e ->
-                match e.BytesRemaining with 
-                | 1 ->
-                    let sensorDataResult = PacketGroupParsing.parsePacketGroup (b::e.BytesReceived) e.PacketGroup
-                    
-                    match sensorDataResult with 
-                    | Ok sensorData -> 
-                        match e.DataAcquisitionMode with 
-                        | Streaming _ ->
-                            printfn "Retrieved sensor data in %i ms." e.Stopwatch.ElapsedMilliseconds
-                        | OneTime ->
-                            SensorDataPrinting.print sensorData
-                    | Error msg     -> 
-                        printfn "%s" msg
-                    match e.DataAcquisitionMode with 
-                    | OneTime     -> None
-                    | Streaming _ -> Some(createPacketExpectation e.TotalBytesExpected e.PacketGroup (Streaming(NotReceived)))
-                | _ ->
-                    match e.DataAcquisitionMode with 
-                    | Streaming preludeByte ->
-                        match preludeByte, (int b) with 
-                        | NotReceived, 19 ->
-                            Some({ e with 
-                                    BytesRemaining = e.BytesRemaining - 1
-                                    BytesReceived = b::e.BytesReceived
-                                    DataAcquisitionMode = Streaming Received
-                            })
-                        | NotReceived, _  -> Some e
-                        | Received, _     ->
-                            Some({ e with 
-                                    BytesRemaining = e.BytesRemaining - 1
-                                    BytesReceived = b::e.BytesReceived
-                            })
-                    | OneTime ->
-                        Some({ e with 
-                                BytesRemaining = e.BytesRemaining - 1
-                                BytesReceived = b::e.BytesReceived
-                            })
+                updateExpectation e b
             | None -> 
                 printf "%c" <| char b
                 // printf "%i " b
