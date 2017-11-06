@@ -23,3 +23,4 @@ let ``Should be able to parse a direct Light Bump Sensors Stream Packet``() =
         sensorData.LightBumpCenterRightSignal.IsSome |> should be True
         sensorData.LightBumpFrontRightSignal.IsSome  |> should be True
         sensorData.LightBumpRightSignal.IsSome       |> should be True
+

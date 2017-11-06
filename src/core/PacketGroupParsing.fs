@@ -73,22 +73,19 @@ let addPacketToSensorData sensorData packetInfo =
     let bytes = packetInfo.Bytes |> List.rev |> List.toArray
     match packetInfo.PacketId with
     | 46 -> 
-        { sensorData with LightBumpLeftSignal        = Some(hiLoBytetoInt bytes) }
+        Ok({ sensorData with LightBumpLeftSignal        = Some(hiLoBytetoInt bytes) })
     | 47 -> 
-        { sensorData with LightBumpFrontLeftSignal   = Some(hiLoBytetoInt bytes) }
+        Ok({ sensorData with LightBumpFrontLeftSignal   = Some(hiLoBytetoInt bytes) })
     | 48 -> 
-        { sensorData with LightBumpCenterLeftSignal  = Some(hiLoBytetoInt bytes) }
+        Ok({ sensorData with LightBumpCenterLeftSignal  = Some(hiLoBytetoInt bytes) })
     | 49 -> 
-        { sensorData with LightBumpCenterRightSignal = Some(hiLoBytetoInt bytes) }
+        Ok({ sensorData with LightBumpCenterRightSignal = Some(hiLoBytetoInt bytes) })
     | 50 -> 
-        { sensorData with LightBumpFrontRightSignal  = Some(hiLoBytetoInt bytes) }
+        Ok({ sensorData with LightBumpFrontRightSignal  = Some(hiLoBytetoInt bytes) })
     | 51 -> 
-        { sensorData with LightBumpRightSignal       = Some(hiLoBytetoInt bytes) }
+        Ok({ sensorData with LightBumpRightSignal       = Some(hiLoBytetoInt bytes) })
     | _ -> 
-        let message = sprintf "I don't know how to parse packet id %i" packetInfo.PacketId
-        printfn "%s" message
-        failwith message
-           
+        Error(sprintf "I don't know how to parse packet id %i" packetInfo.PacketId)
 
 
 let parseLightBumpSensors byteList =
@@ -101,32 +98,40 @@ let parseLightBumpSensors byteList =
         let sensorData =
             rev 
             |> List.skip 2 // skip Packet ID and Byte count byte
-            |> List.fold (fun (sensorData, parsingState, totalBytesRemaining) currentByte ->
+            |> List.fold (fun (sensorDataOpt, parsingState, totalBytesRemaining) currentByte ->
                 printfn "*****************************************"
                 printfn "currentByte: %A" currentByte
                 // printfn "sensorData: %A" sensorData
                 printfn "parsingState: %A" parsingState
                 printfn "totalBytesRemaining: %A" totalBytesRemaining
-                match parsingState with
-                | SeekingPacketNumber ->
-                    match totalBytesRemaining with 
-                    | 0 ->
-                        (sensorData, parsingState, totalBytesRemaining)
-                    | _ ->
-                        let packetInfo = { PacketId = int currentByte; BytesRemaining = packetLengths.[int currentByte]; Bytes = [] }
-                        (sensorData, ParsingPacket(packetInfo), totalBytesRemaining - 1)
-                | ParsingPacket packetInfo  ->
-                    match packetInfo.BytesRemaining with 
-                    | 1 -> 
-                        let newSensorData = addPacketToSensorData sensorData { packetInfo with Bytes = currentByte::packetInfo.Bytes }
-                        (newSensorData, SeekingPacketNumber, totalBytesRemaining - 1)
-                    | _ ->
-                        let newPacketInfo = { packetInfo with 
-                                                    BytesRemaining = packetInfo.BytesRemaining - 1
-                                                    Bytes = currentByte::packetInfo.Bytes
-                                            }
-                        (sensorData, ParsingPacket(newPacketInfo), totalBytesRemaining - 1)
-                ) (defaultSensorData, SeekingPacketNumber, int rev.[1])
+                match sensorDataOpt with
+                | Error _ -> (sensorDataOpt, parsingState, totalBytesRemaining - 1)
+                | Ok sensorData ->
+                    match parsingState with
+                    | SeekingPacketNumber ->
+                        match totalBytesRemaining with 
+                        | 0 ->
+                            (Ok(sensorData), parsingState, totalBytesRemaining)
+                        | _ ->
+                            match packetLengths.ContainsKey <| int currentByte with
+                            | false ->
+                                let msg = sprintf "Unknown length for packet ID: %i" <| int currentByte
+                                (Error(msg), parsingState, totalBytesRemaining - 1)
+                            | true -> 
+                                let packetInfo = { PacketId = int currentByte; BytesRemaining = packetLengths.[int currentByte]; Bytes = [] }
+                                (Ok(sensorData), ParsingPacket(packetInfo), totalBytesRemaining - 1)
+                    | ParsingPacket packetInfo  ->
+                        match packetInfo.BytesRemaining with 
+                        | 1 -> 
+                            let newSensorData = addPacketToSensorData sensorData { packetInfo with Bytes = currentByte::packetInfo.Bytes }
+                            (newSensorData, SeekingPacketNumber, totalBytesRemaining - 1)
+                        | _ ->
+                            let newPacketInfo = { packetInfo with 
+                                                        BytesRemaining = packetInfo.BytesRemaining - 1
+                                                        Bytes = currentByte::packetInfo.Bytes
+                                                }
+                            (Ok(sensorData), ParsingPacket(newPacketInfo), totalBytesRemaining - 1)
+                ) (Ok(defaultSensorData), SeekingPacketNumber, int rev.[1])
             |> fstOf3
 
         byteList
@@ -134,7 +139,7 @@ let parseLightBumpSensors byteList =
         |> List.rev
         |> printfn "The Bytes are %A "
         
-        Ok sensorData
+        sensorData
 
 let parsePacketGroup byteList = function
     | Group100         -> parsePacketGroup100 byteList
