@@ -113,8 +113,11 @@ module Roomba =
                     
                     match sensorDataResult with 
                     | Ok sensorData -> 
-                        printfn "Retrieved sensor data in %i ms." e.Stopwatch.ElapsedMilliseconds
-                        // SensorDataPrinting.print sensorData
+                        match e.DataAcquisitionMode with 
+                        | Streaming _ ->
+                            printfn "Retrieved sensor data in %i ms." e.Stopwatch.ElapsedMilliseconds
+                        | OneTime ->
+                            SensorDataPrinting.print sensorData
                     | Error msg     -> 
                         printfn "%s" msg
                     match e.DataAcquisitionMode with 
@@ -142,7 +145,7 @@ module Roomba =
                                 BytesReceived = b::e.BytesReceived
                             })
             | None -> 
-                // printf "%c" <| char b
-                printf "%i " b
+                printf "%c" <| char b
+                // printf "%i " b
                 None
         { roomba with PacketExpectation = updatedExpectation }
