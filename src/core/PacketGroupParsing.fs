@@ -37,46 +37,51 @@ type StreamFoldState =
 
 let fstOf3 (x, _, _) = x
 
-let parsePacketGroup byteList = function
-    | Group100 ->
-        let len = byteList |> List.length
-        match len with
-        | 80 ->
-            let ba = byteList |> List.rev |> List.toArray
-            Ok({
-                    defaultSensorData with
-                        BumpDrop = Some(parseBumpsWheeldrops ba.[0])
-                        Wall = Some(parseWall ba.[1])
-                        WallSignal = Some(hiLoBytetoInt ba.[26..27])
-                        CliffLeftSignal = Some(hiLoBytetoInt ba.[28..29])
-                        CliffFrontLeftSignal = Some(hiLoBytetoInt ba.[30..31])
-                        CliffFrontRightSignal = Some(hiLoBytetoInt ba.[32..33])
-                        CliffRightSignal = Some(hiLoBytetoInt ba.[34..35])
-                        BatteryCharge = Some((hiLoBytetoInt ba.[22..23]) * 1<mAh>)
-                        LightBumpLeftSignal          = Some(hiLoBytetoInt ba.[57..58])
-                        LightBumpFrontLeftSignal           = Some(hiLoBytetoInt ba.[59..60])
-                        LightBumpCenterLeftSignal          = Some(hiLoBytetoInt ba.[61..62])
-                        LightBumpCenterRightSignal   = Some(hiLoBytetoInt ba.[63..64])
-                        LightBumpFrontRightSignal          = Some(hiLoBytetoInt ba.[65..66])
-                        LightBumpRightSignal         = Some(hiLoBytetoInt ba.[67..68])
-                })
-        | _ -> Error(sprintf "Packet group 100 must be 80 bytes in length, but was %i" len)
-    | LightBumpSensors ->
-        let len = byteList |> List.length
-        match len < 5 with // prelude byte + stream length byte + at least 1 packet id + at least one packet byte + checksum byte
-        | true -> Error(sprintf "Need at least 5 bytes to make valid stream, but was %i" len)
-        | false ->
-            // [19; 18; 46; 0; 0; 47; 0; 0; 48; 0; 0; 49; 0; 0; 50; 0; 0; 51; 0; 0; 184]
-            let dataByteCount = int byteList.[1]
-            let sensorData =
-                byteList 
-                |> List.skip 2
-                |> List.fold (fun acc elem -> acc) (defaultSensorData, SeekingPacketNumber, dataByteCount)
-                |> fstOf3
+let parsePacketGroup100 byteList =
+    let len = byteList |> List.length
+    match len with
+    | 80 ->
+        let ba = byteList |> List.rev |> List.toArray
+        Ok({
+                defaultSensorData with
+                    BumpDrop = Some(parseBumpsWheeldrops ba.[0])
+                    Wall = Some(parseWall ba.[1])
+                    WallSignal = Some(hiLoBytetoInt ba.[26..27])
+                    CliffLeftSignal = Some(hiLoBytetoInt ba.[28..29])
+                    CliffFrontLeftSignal = Some(hiLoBytetoInt ba.[30..31])
+                    CliffFrontRightSignal = Some(hiLoBytetoInt ba.[32..33])
+                    CliffRightSignal = Some(hiLoBytetoInt ba.[34..35])
+                    BatteryCharge = Some((hiLoBytetoInt ba.[22..23]) * 1<mAh>)
+                    LightBumpLeftSignal          = Some(hiLoBytetoInt ba.[57..58])
+                    LightBumpFrontLeftSignal           = Some(hiLoBytetoInt ba.[59..60])
+                    LightBumpCenterLeftSignal          = Some(hiLoBytetoInt ba.[61..62])
+                    LightBumpCenterRightSignal   = Some(hiLoBytetoInt ba.[63..64])
+                    LightBumpFrontRightSignal          = Some(hiLoBytetoInt ba.[65..66])
+                    LightBumpRightSignal         = Some(hiLoBytetoInt ba.[67..68])
+            })
+    | _ -> Error(sprintf "Packet group 100 must be 80 bytes in length, but was %i" len)
 
-            byteList
-            |> List.map int
-            |> List.rev
-            |> printfn "The Bytes are %A "
-            
-            Ok sensorData
+let parseLightBumpSensors byteList =
+    let len = byteList |> List.length
+    match len < 5 with // prelude byte + stream length byte + at least 1 packet id + at least one packet byte + checksum byte
+    | true -> Error(sprintf "Need at least 5 bytes to make valid stream, but was %i" len)
+    | false ->
+        // [19; 18; 46; 0; 0; 47; 0; 0; 48; 0; 0; 49; 0; 0; 50; 0; 0; 51; 0; 0; 184]
+        let dataByteCount = int byteList.[1]
+        let sensorData =
+            byteList 
+            |> List.skip 2
+            |> List.fold (fun acc elem -> acc) (defaultSensorData, SeekingPacketNumber, dataByteCount)
+            |> fstOf3
+
+        byteList
+        |> List.map int
+        |> List.rev
+        |> printfn "The Bytes are %A "
+        
+        Ok sensorData
+
+let parsePacketGroup byteList = function
+    | Group100         -> parsePacketGroup100 byteList
+    | LightBumpSensors -> parseLightBumpSensors byteList
+        
