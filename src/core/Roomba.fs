@@ -110,10 +110,13 @@ module Roomba =
                 match e.BytesRemaining with 
                 | 1 ->
                     let sensorDataResult = PacketGroupParsing.parsePacketGroup (b::e.BytesReceived) e.PacketGroup
-                    printfn "Retrieved sensor data in %i ms." e.Stopwatch.ElapsedMilliseconds
+                    
                     match sensorDataResult with 
-                    | Ok sensorData -> SensorDataPrinting.print sensorData
-                    | Error msg -> printfn "%s" msg
+                    | Ok sensorData -> 
+                        printfn "Retrieved sensor data in %i ms." e.Stopwatch.ElapsedMilliseconds
+                        // SensorDataPrinting.print sensorData
+                    | Error msg     -> 
+                        printfn "%s" msg
                     match e.DataAcquisitionMode with 
                     | OneTime     -> None
                     | Streaming _ -> Some(createPacketExpectation e.TotalBytesExpected e.PacketGroup (Streaming(NotReceived)))

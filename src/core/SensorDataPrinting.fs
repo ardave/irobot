@@ -24,7 +24,7 @@ let printLightBumpRightSignal s = printfn "Light Bump Right: %i" s
 let printBatteryCharge s = printfn "Battery Charge: %A" s
 
 let print sensorData = 
-    printfn "******************************"
+    // printfn "******************************"
     sensorData.BumpDrop |> Option.iter printBumpDrop
     sensorData.Wall |> Option.iter printWall
     sensorData.WallSignal |> Option.iter printWallSignal

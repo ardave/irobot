@@ -68,7 +68,7 @@ type StreamParsingState =
 let fstOf3 (x, _, _) = x
 
 let addPacketToSensorData sensorData packetInfo =
-    printfn "---- Adding packet to sensor data: %A" packetInfo
+    // printfn "---- Adding packet to sensor data: %A" packetInfo
 
     let bytes = packetInfo.Bytes |> List.rev |> List.toArray
     match packetInfo.PacketId with
@@ -99,11 +99,11 @@ let parseLightBumpSensors byteList =
             rev 
             |> List.skip 2 // skip Packet ID and Byte count byte
             |> List.fold (fun (sensorDataOpt, parsingState, totalBytesRemaining) currentByte ->
-                printfn "*****************************************"
-                printfn "currentByte: %A" currentByte
+                // printfn "*****************************************"
+                // printfn "currentByte: %A" currentByte
                 // printfn "sensorData: %A" sensorData
-                printfn "parsingState: %A" parsingState
-                printfn "totalBytesRemaining: %A" totalBytesRemaining
+                // printfn "parsingState: %A" parsingState
+                // printfn "totalBytesRemaining: %A" totalBytesRemaining
                 match sensorDataOpt with
                 | Error _ -> (sensorDataOpt, parsingState, totalBytesRemaining - 1)
                 | Ok sensorData ->
@@ -134,10 +134,10 @@ let parseLightBumpSensors byteList =
                 ) (Ok(defaultSensorData), SeekingPacketNumber, int rev.[1])
             |> fstOf3
 
-        byteList
-        |> List.map int
-        |> List.rev
-        |> printfn "The Bytes are %A "
+        // byteList
+        // |> List.map int
+        // |> List.rev
+        // |> printfn "The Bytes are %A "
         
         sensorData
 
