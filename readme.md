@@ -1,6 +1,8 @@
 F# interface to [iRobot Create 2 Robotics kit](http://store.irobot.com/default/create-programmable-programmable-robot-irobot-create-2/RC65099.html)
 
-Initially targeting Mono over Dotnet Core due to better Raspberry Pi/ARM compatibility.
+~~Initially targeting Mono over Dotnet Core due to better Raspberry Pi/ARM compatibility.~~
+
+Project uses Dotnet Core because its project management system is so much better.
 
 Serial IO uses https://github.com/jcurl/SerialPortStream. 
   It is recommended to build one's own copy of libnserial.so.1 using the instructions under 
