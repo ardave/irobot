@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="BitStuff.fs" />
+    <Compile Include="ComputationExpressions.fs" />
+    <Compile Include="UnitsOfMeasure.fs" />
+    <Compile Include="BaudRate.fs" />
+    <Compile Include="CommandData.fs" />
+    <Compile Include="OperatingMode.fs" />
+    <Compile Include="SensorData.fs" />
+    <Compile Include="PacketGroupParsing.fs" />
+    <Compile Include="SensorDataPrinting.fs" />
+    <Compile Include="Command.fs" />
+    <Compile Include="ActuatorCommand.fs" />
+    <Compile Include="Roomba.fs" />
+    <Compile Include="InputCommand.fs" />
+  </ItemGroup>
+
+</Project>
