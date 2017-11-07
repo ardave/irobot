@@ -19,10 +19,17 @@ type DataAcquisitionMode =
 | Streaming of PreludeByte
 | OneTime
 
+// For streaming data, we need to receive the first
+// couple of bytes before we know how many more bytes 
+// to expect:
+type BytesRemaining = 
+| Unknown
+| BytesRemaining of int
+
 type PacketExpectation = {
     BytesReceived       : byte list
-    TotalBytesExpected  : int
-    BytesRemaining      : int
+    TotalBytesExpected  : BytesRemaining
+    BytesRemaining      : BytesRemaining
     PacketGroup         : PacketGroup
     Stopwatch           : Stopwatch
     DataAcquisitionMode : DataAcquisitionMode
@@ -87,7 +94,7 @@ module Roomba =
         }
     let readSensors roomba = 
         roomba.SendCommand <| { OpCode = 142uy; DataBytes = [|100uy|] }
-        { roomba with PacketExpectation = Some(createPacketExpectation 80 Group100 OneTime) }
+        { roomba with PacketExpectation = Some(createPacketExpectation (BytesRemaining(80)) Group100 OneTime) }
 
     let private logByte b roomba =
         roomba.ReceivedByteLog.Enqueue({ Byte = b; ReceivedAt = DateTime.Now - startTime })
@@ -100,9 +107,9 @@ module Roomba =
         let numberOfPackets = [| requestedPackets |> Array.length |> byte |]
         let commandData = { OpCode = 148uy; DataBytes = Array.append numberOfPackets requestedPackets }
         roomba.SendCommand commandData
-        { roomba with PacketExpectation = Some(createPacketExpectation 21 LightBumpSensors (Streaming(NotReceived))) }
+        { roomba with PacketExpectation = Some(createPacketExpectation (BytesRemaining(21)) LightBumpSensors (Streaming(NotReceived))) }
 
-    let private parsePacketGroup e b=
+    let private parsePacketGroup e b =
         let sensorDataResult = PacketGroupParsing.parsePacketGroup (b::e.BytesReceived) e.PacketGroup
         
         match sensorDataResult with 
@@ -118,32 +125,42 @@ module Roomba =
         | OneTime     -> None
         | Streaming _ -> Some(createPacketExpectation e.TotalBytesExpected e.PacketGroup (Streaming(NotReceived)))
 
-    let private receiveIntermediateByte e b=
-        match e.DataAcquisitionMode with 
+    let private receiveIntermediateByte pe b =
+        match pe.DataAcquisitionMode with 
         | Streaming preludeByte ->
             match preludeByte, (int b) with 
             | NotReceived, 19 ->
-                Some({ e with 
-                        BytesRemaining = e.BytesRemaining - 1
-                        BytesReceived = b::e.BytesReceived
+                Some({ pe with 
+                        BytesRemaining = Unknown
+                        BytesReceived = b::pe.BytesReceived
                         DataAcquisitionMode = Streaming Received
                 })
-            | NotReceived, _  -> Some e
-            | Received, _     ->
-                Some({ e with 
-                        BytesRemaining = e.BytesRemaining - 1
-                        BytesReceived = b::e.BytesReceived
+            | NotReceived, _  -> Some pe
+            | Received,    _  ->
+                Some({ pe with
+                        BytesRemaining =
+                            match pe.BytesRemaining with
+                            | BytesRemaining br -> BytesRemaining(br - 1)
+                            | Unknown           -> Unknown
+                        BytesReceived = b::pe.BytesReceived
                 })
         | OneTime ->
-            Some({ e with 
-                    BytesRemaining = e.BytesRemaining - 1
-                    BytesReceived = b::e.BytesReceived
+            Some({ pe with
+                    BytesRemaining =
+                        match pe.BytesRemaining with
+                        | BytesRemaining br -> BytesRemaining(br - 1)
+                        | Unknown           -> failwith "Bytes Remaining should never be 'Unknown' for a OneTime data acquisition"
+                    BytesReceived = b::pe.BytesReceived
                 })
 
-    let private updateExpectation e b = 
-        match e.BytesRemaining with 
-        | 1 -> parsePacketGroup e b
-        | _ -> receiveIntermediateByte e b
+    let private updateExpectation pe b =
+        match pe.BytesRemaining with
+        | Unknown ->
+            receiveIntermediateByte pe b
+        | BytesRemaining i ->
+            match i with
+            | 1 -> parsePacketGroup pe b
+            | _ -> receiveIntermediateByte pe b
 
     let processByte b roomba =
         logByte b roomba
