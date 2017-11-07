@@ -11,12 +11,13 @@ type ReceivedByte = {
     ReceivedAt : TimeSpan
 }
 
-type PreludeByte =
-| Received
-| NotReceived
+type StreamingStep =
+| Initial
+| PreludeByteReceived
+| DataLengthByteReceived
 
 type DataAcquisitionMode = 
-| Streaming of PreludeByte
+| Streaming of StreamingStep
 | OneTime
 
 // For streaming data, we need to receive the first
@@ -107,7 +108,7 @@ module Roomba =
         let numberOfPackets = [| requestedPackets |> Array.length |> byte |]
         let commandData = { OpCode = 148uy; DataBytes = Array.append numberOfPackets requestedPackets }
         roomba.SendCommand commandData
-        { roomba with PacketExpectation = Some(createPacketExpectation (BytesRemaining(21)) LightBumpSensors (Streaming(NotReceived))) }
+        { roomba with PacketExpectation = Some(createPacketExpectation Unknown LightBumpSensors (Streaming(Initial))) }
 
     let private parsePacketGroup e b =
         let sensorDataResult = PacketGroupParsing.parsePacketGroup (b::e.BytesReceived) e.PacketGroup
@@ -123,27 +124,31 @@ module Roomba =
             printfn "%s" msg
         match e.DataAcquisitionMode with 
         | OneTime     -> None
-        | Streaming _ -> Some(createPacketExpectation e.TotalBytesExpected e.PacketGroup (Streaming(NotReceived)))
+        | Streaming _ -> Some(createPacketExpectation e.TotalBytesExpected e.PacketGroup (Streaming(Initial)))
 
     let private receiveIntermediateByte pe b =
         match pe.DataAcquisitionMode with 
-        | Streaming preludeByte ->
-            match preludeByte, (int b) with 
-            | NotReceived, 19 ->
-                Some({ pe with 
-                        BytesRemaining = Unknown
-                        BytesReceived = b::pe.BytesReceived
-                        DataAcquisitionMode = Streaming Received
-                })
-            | NotReceived, _  -> Some pe
-            | Received,    _  ->
-                Some({ pe with
-                        BytesRemaining =
-                            match pe.BytesRemaining with
-                            | BytesRemaining br -> BytesRemaining(br - 1)
-                            | Unknown           -> Unknown
-                        BytesReceived = b::pe.BytesReceived
-                })
+        | Streaming streamingStep ->
+            match streamingStep with 
+            | Initial ->
+                match int b with 
+                | 19 ->
+                    Some({ pe with 
+                            BytesRemaining = Unknown
+                            BytesReceived = b::pe.BytesReceived
+                            DataAcquisitionMode = Streaming PreludeByteReceived
+                    })
+                | _ -> Some pe
+            | PreludeByteReceived -> Some({ pe with 
+                                                BytesRemaining = BytesRemaining(int b)
+                                                BytesReceived = b::pe.BytesReceived
+                                                DataAcquisitionMode = Streaming DataLengthByteReceived
+                                     })
+            | DataLengthByteReceived -> Some({ pe with 
+                                                BytesRemaining = BytesRemaining(int b)
+                                                BytesReceived = b::pe.BytesReceived
+                                                DataAcquisitionMode = Streaming DataLengthByteReceived
+                                        })
         | OneTime ->
             Some({ pe with
                     BytesRemaining =
@@ -152,6 +157,31 @@ module Roomba =
                         | Unknown           -> failwith "Bytes Remaining should never be 'Unknown' for a OneTime data acquisition"
                     BytesReceived = b::pe.BytesReceived
                 })
+
+        //     match preludeByte, (int b) with 
+        //     | NotReceived, 19 ->
+        //         Some({ pe with 
+        //                 BytesRemaining = Unknown
+        //                 BytesReceived = b::pe.BytesReceived
+        //                 DataAcquisitionMode = Streaming Received
+        //         })
+        //     | NotReceived, _  -> Some pe
+        //     | Received,    _  ->
+        //         Some({ pe with
+        //                 BytesRemaining =
+        //                     match pe.BytesRemaining with
+        //                     | BytesRemaining br -> BytesRemaining(br - 1)
+        //                     | Unknown           -> Unknown
+        //                 BytesReceived = b::pe.BytesReceived
+        //         })
+        // | OneTime ->
+        //     Some({ pe with
+        //             BytesRemaining =
+        //                 match pe.BytesRemaining with
+        //                 | BytesRemaining br -> BytesRemaining(br - 1)
+        //                 | Unknown           -> failwith "Bytes Remaining should never be 'Unknown' for a OneTime data acquisition"
+        //             BytesReceived = b::pe.BytesReceived
+        //         })
 
     let private updateExpectation pe b =
         match pe.BytesRemaining with
