@@ -8,6 +8,8 @@ let main _ =
     printfn "Starting ..."
     let byteReceived, writeBytes, disposableOpt = createConnection (Real("/dev/ttyUSB0"))
     let messageAgent = createMessageAgent(writeBytes)
+    messageAgent.Error.Add
+        (fun (exn:Exception) -> printfn "Unhandled Exception:\n%A" exn)
 
     try
         byteReceived (messageAgent.Post << ByteReceivedFromRobot)
