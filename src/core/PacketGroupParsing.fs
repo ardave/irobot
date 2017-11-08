@@ -72,6 +72,8 @@ let addPacketToSensorData sensorData packetInfo =
 
     let bytes = packetInfo.Bytes |> List.rev |> List.toArray
     match packetInfo.PacketId with
+    | 21 ->
+        Ok({ sensorData with ChargingState = Some (parseChargingState packetInfo.Bytes.[0])})
     | 46 -> 
         Ok({ sensorData with LightBumpLeftSignal        = Some(hiLoBytetoInt bytes) })
     | 47 -> 
