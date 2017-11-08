@@ -84,7 +84,7 @@ module Roomba =
         roomba.SendCommand <| Actuation.createDriveCommand velocity radius
         roomba
 
-    let createPacketExpectation b pg m = 
+    let private createPacketExpectation b pg m = 
         {
             BytesReceived       = []
             BytesRemaining      = b
@@ -111,13 +111,17 @@ module Roomba =
         { roomba with PacketExpectation = Some(createPacketExpectation Unknown LightBumpSensors (Streaming(Initial))) }
 
     let private parsePacketGroup e b =
+        let sw = Stopwatch.StartNew()
         let sensorDataResult = PacketGroupParsing.parsePacketGroup (b::e.BytesReceived) e.PacketGroup
+        // printfn "Parsed packet group in %i ms." sw.ElapsedMilliseconds
+
+        // printfn "%A" sensorDataResult
         
         match sensorDataResult with 
         | Ok sensorData -> 
             match e.DataAcquisitionMode with 
             | Streaming _ ->
-                printfn "Retrieved sensor data in %i ms." e.Stopwatch.ElapsedMilliseconds
+                ()//printfn "Retrieved sensor data in %i ms." e.Stopwatch.ElapsedMilliseconds
             | OneTime ->
                 SensorDataPrinting.print sensorData
         | Error msg     -> 
@@ -126,6 +130,7 @@ module Roomba =
         | OneTime     -> None
         | Streaming _ -> Some(createPacketExpectation e.TotalBytesExpected e.PacketGroup (Streaming(Initial)))
 
+    // I think the failwiths are exposing an inaccuracy in the shape of my ADTs:
     let private receiveIntermediateByte pe b =
         match pe.DataAcquisitionMode with 
         | Streaming streamingStep ->
@@ -145,7 +150,10 @@ module Roomba =
                                                 DataAcquisitionMode = Streaming DataLengthByteReceived
                                      })
             | DataLengthByteReceived -> Some({ pe with 
-                                                BytesRemaining = BytesRemaining(int b)
+                                                BytesRemaining = 
+                                                    match pe.BytesRemaining with
+                                                    | BytesRemaining br -> BytesRemaining(br - 1)
+                                                    | Unknown           -> failwith "Bytes Remaining should never be 'Unknown' for a a stream in the DataLength streaming step."
                                                 BytesReceived = b::pe.BytesReceived
                                                 DataAcquisitionMode = Streaming DataLengthByteReceived
                                         })

@@ -95,6 +95,7 @@ let parseLightBumpSensors byteList =
     | false ->
         // [19; 18; 46; 0; 0; 47; 0; 0; 48; 0; 0; 49; 0; 0; 50; 0; 0; 51; 0; 0; 184]
         let rev = byteList |> List.rev
+        // printfn "The bytes are: %A" rev
         let sensorData =
             rev 
             |> List.skip 2 // skip Packet ID and Byte count byte
@@ -138,7 +139,7 @@ let parseLightBumpSensors byteList =
         // |> List.map int
         // |> List.rev
         // |> printfn "The Bytes are %A "
-        
+        printfn "%A" sensorData
         sensorData
 
 let parsePacketGroup byteList = function
