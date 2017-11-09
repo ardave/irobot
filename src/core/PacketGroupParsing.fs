@@ -72,6 +72,20 @@ let addPacketToSensorData sensorData packetInfo =
 
     let bytes = packetInfo.Bytes |> List.rev |> List.toArray
     match packetInfo.PacketId with
+    | 19 ->
+        let additionalMMs = hiLoBytetoInt bytes * 1<mm>
+        let newmms =
+            match sensorData.Distance with
+            | Some mms -> Some(mms + additionalMMs)
+            | None     -> Some(additionalMMs)
+        Ok({ sensorData with Distance = newmms })
+    |20 ->
+        let additionalDegrees = hiLoBytetoInt bytes * 1<degrees>
+        let newmms =
+            match sensorData.Angle with
+            | Some degrees -> Some(degrees + additionalDegrees)
+            | None         -> Some(additionalDegrees)
+        Ok({ sensorData with Angle = newmms })
     | 21 ->
         Ok({ sensorData with ChargingState = Some (parseChargingState packetInfo.Bytes.[0])})
     | 46 -> 
@@ -141,7 +155,7 @@ let parseLightBumpSensors byteList =
         // |> List.map int
         // |> List.rev
         // |> printfn "The Bytes are %A "
-        printfn "%A" sensorData
+        // printfn "%A" sensorData
         sensorData
 
 let parsePacketGroup byteList = function

@@ -34,6 +34,7 @@ type PacketExpectation = {
     PacketGroup         : PacketGroup
     Stopwatch           : Stopwatch
     DataAcquisitionMode : DataAcquisitionMode
+    LastReportAt        : DateTime
 }
 
 type Roomba = {
@@ -84,7 +85,7 @@ module Roomba =
         roomba.SendCommand <| Actuation.createDriveCommand velocity radius
         roomba
 
-    let private createPacketExpectation b pg m = 
+    let private createPacketExpectation b pg m lr = 
         {
             BytesReceived       = []
             BytesRemaining      = b
@@ -92,10 +93,11 @@ module Roomba =
             PacketGroup         = pg
             Stopwatch           = Stopwatch.StartNew()
             DataAcquisitionMode = m
+            LastReportAt        = lr
         }
     let readSensors roomba = 
         roomba.SendCommand <| { OpCode = 142uy; DataBytes = [|100uy|] }
-        { roomba with PacketExpectation = Some(createPacketExpectation (BytesRemaining(80)) Group100 OneTime) }
+        { roomba with PacketExpectation = Some(createPacketExpectation (BytesRemaining(80)) Group100 OneTime DateTime.Now) }
 
     let private logByte b roomba =
         roomba.ReceivedByteLog.Enqueue({ Byte = b; ReceivedAt = DateTime.Now - startTime })
@@ -104,11 +106,26 @@ module Roomba =
                 roomba.ReceivedByteLog.Dequeue() |> ignore
 
     let beginStreaming roomba =
-        let requestedPackets = [| 46uy; 47uy; 48uy; 49uy; 50uy; 51uy; 21uy |]
+        let requestedPackets = [| 46uy; 47uy; 48uy; 49uy; 50uy; 51uy; 21uy; 19uy; 20uy |]
         let numberOfPackets = [| requestedPackets |> Array.length |> byte |]
         let commandData = { OpCode = 148uy; DataBytes = Array.append numberOfPackets requestedPackets }
         roomba.SendCommand commandData
-        { roomba with PacketExpectation = Some(createPacketExpectation Unknown LightBumpSensors (Streaming(Initial))) }
+        { roomba with PacketExpectation = Some(createPacketExpectation Unknown LightBumpSensors (Streaming(Initial)) DateTime.Now) }
+
+    let private printReportEvery sensorData lastPrintedAt timeSpan =
+        if DateTime.Now - lastPrintedAt > timeSpan then
+            printfn "LightBumpLeftSignal        %A" sensorData.LightBumpLeftSignal
+            printfn "LightBumpFrontLeftSignal   %A" sensorData.LightBumpFrontLeftSignal
+            printfn "LightBumpCenterLeftSignal  %A" sensorData.LightBumpCenterLeftSignal
+            printfn "LightBumpCenterRightSignal %A" sensorData.LightBumpCenterRightSignal
+            printfn "LightBumpFrontRightSignal  %A" sensorData.LightBumpFrontRightSignal
+            printfn "LightBumpRightSignal       %A" sensorData.LightBumpRightSignal
+            printfn "BatteryCharge              %A" sensorData.BatteryCharge
+            printfn "Distance                   %A" sensorData.Distance
+            printfn "Angle                      %A" sensorData.Angle
+            DateTime.Now
+        else
+            lastPrintedAt
 
     let private parsePacketGroup e b =
         let sw = Stopwatch.StartNew()
@@ -117,18 +134,21 @@ module Roomba =
 
         // printfn "%A" sensorDataResult
         
-        match sensorDataResult with 
-        | Ok sensorData -> 
-            match e.DataAcquisitionMode with 
-            | Streaming _ ->
-                ()//printfn "Retrieved sensor data in %i ms." e.Stopwatch.ElapsedMilliseconds
-            | OneTime ->
-                SensorDataPrinting.print sensorData
-        | Error msg     -> 
-            printfn "%s" msg
+        let lastPrintedAt = 
+            match sensorDataResult with 
+            | Ok sensorData -> 
+                match e.DataAcquisitionMode with 
+                | Streaming _ ->
+                    printReportEvery sensorData e.LastReportAt (TimeSpan.FromSeconds(3.))
+                | OneTime ->
+                    SensorDataPrinting.print sensorData 
+                    DateTime.MinValue
+            | Error msg     -> 
+                printfn "%s" msg
+                DateTime.MinValue
         match e.DataAcquisitionMode with 
         | OneTime     -> None
-        | Streaming _ -> Some(createPacketExpectation e.TotalBytesExpected e.PacketGroup (Streaming(Initial)))
+        | Streaming _ -> Some(createPacketExpectation e.TotalBytesExpected e.PacketGroup (Streaming(Initial)) lastPrintedAt)
 
     // I think the failwiths are exposing an inaccuracy in the shape of my ADTs:
     let private receiveIntermediateByte pe b =
@@ -165,31 +185,6 @@ module Roomba =
                         | Unknown           -> failwith "Bytes Remaining should never be 'Unknown' for a OneTime data acquisition"
                     BytesReceived = b::pe.BytesReceived
                 })
-
-        //     match preludeByte, (int b) with 
-        //     | NotReceived, 19 ->
-        //         Some({ pe with 
-        //                 BytesRemaining = Unknown
-        //                 BytesReceived = b::pe.BytesReceived
-        //                 DataAcquisitionMode = Streaming Received
-        //         })
-        //     | NotReceived, _  -> Some pe
-        //     | Received,    _  ->
-        //         Some({ pe with
-        //                 BytesRemaining =
-        //                     match pe.BytesRemaining with
-        //                     | BytesRemaining br -> BytesRemaining(br - 1)
-        //                     | Unknown           -> Unknown
-        //                 BytesReceived = b::pe.BytesReceived
-        //         })
-        // | OneTime ->
-        //     Some({ pe with
-        //             BytesRemaining =
-        //                 match pe.BytesRemaining with
-        //                 | BytesRemaining br -> BytesRemaining(br - 1)
-        //                 | Unknown           -> failwith "Bytes Remaining should never be 'Unknown' for a OneTime data acquisition"
-        //             BytesReceived = b::pe.BytesReceived
-        //         })
 
     let private updateExpectation pe b =
         match pe.BytesRemaining with
