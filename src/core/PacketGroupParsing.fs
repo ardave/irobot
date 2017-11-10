@@ -38,20 +38,20 @@ let parsePacketGroup100 byteList =
         let ba = byteList |> List.rev |> List.toArray
         Ok({
                 defaultSensorData with
-                    BumpDrop = Some(parseBumpsWheeldrops ba.[0])
-                    Wall = Some(parseWall ba.[1])
-                    WallSignal = Some(hiLoBytetoInt ba.[26..27])
-                    CliffLeftSignal = Some(hiLoBytetoInt ba.[28..29])
-                    CliffFrontLeftSignal = Some(hiLoBytetoInt ba.[30..31])
-                    CliffFrontRightSignal = Some(hiLoBytetoInt ba.[32..33])
-                    CliffRightSignal = Some(hiLoBytetoInt ba.[34..35])
-                    BatteryCharge = Some((hiLoBytetoInt ba.[22..23]) * 1<mAh>)
-                    LightBumpLeftSignal          = Some(hiLoBytetoInt ba.[57..58])
-                    LightBumpFrontLeftSignal           = Some(hiLoBytetoInt ba.[59..60])
-                    LightBumpCenterLeftSignal          = Some(hiLoBytetoInt ba.[61..62])
-                    LightBumpCenterRightSignal   = Some(hiLoBytetoInt ba.[63..64])
-                    LightBumpFrontRightSignal          = Some(hiLoBytetoInt ba.[65..66])
-                    LightBumpRightSignal         = Some(hiLoBytetoInt ba.[67..68])
+                    BumpDrop                   = Some(parseBumpsWheeldrops ba.[0])
+                    Wall                       = Some(parseWall ba.[1])
+                    WallSignal                 = Some(hiLoBytetoInt ba.[26..27])
+                    CliffLeftSignal            = Some(hiLoBytetoInt ba.[28..29])
+                    CliffFrontLeftSignal       = Some(hiLoBytetoInt ba.[30..31])
+                    CliffFrontRightSignal      = Some(hiLoBytetoInt ba.[32..33])
+                    CliffRightSignal           = Some(hiLoBytetoInt ba.[34..35])
+                    BatteryCharge              = Some((hiLoBytetoInt ba.[22..23]) * 1<mAh>)
+                    LightBumpLeftSignal        = Some(hiLoBytetoInt ba.[57..58])
+                    LightBumpFrontLeftSignal   = Some(hiLoBytetoInt ba.[59..60])
+                    LightBumpCenterLeftSignal  = Some(hiLoBytetoInt ba.[61..62])
+                    LightBumpCenterRightSignal = Some(hiLoBytetoInt ba.[63..64])
+                    LightBumpFrontRightSignal  = Some(hiLoBytetoInt ba.[65..66])
+                    LightBumpRightSignal       = Some(hiLoBytetoInt ba.[67..68])
             })
     | _ -> Error(sprintf "Packet group 100 must be 80 bytes in length, but was %i" len)
 
@@ -86,22 +86,14 @@ let addPacketToSensorData sensorData packetInfo =
             | Some degrees -> Some(degrees + additionalDegrees)
             | None         -> Some(additionalDegrees)
         Ok({ sensorData with Angle = newmms })
-    | 21 ->
-        Ok({ sensorData with ChargingState = Some(parseChargingState packetInfo.Bytes.[0])})
-    | 25 -> 
-        Ok({ sensorData with BatteryCharge = Some((hiLoBytetoInt bytes) * 1<mAh>)})
-    | 46 -> 
-        Ok({ sensorData with LightBumpLeftSignal        = Some(hiLoBytetoInt bytes) })
-    | 47 -> 
-        Ok({ sensorData with LightBumpFrontLeftSignal   = Some(hiLoBytetoInt bytes) })
-    | 48 -> 
-        Ok({ sensorData with LightBumpCenterLeftSignal  = Some(hiLoBytetoInt bytes) })
-    | 49 -> 
-        Ok({ sensorData with LightBumpCenterRightSignal = Some(hiLoBytetoInt bytes) })
-    | 50 -> 
-        Ok({ sensorData with LightBumpFrontRightSignal  = Some(hiLoBytetoInt bytes) })
-    | 51 -> 
-        Ok({ sensorData with LightBumpRightSignal       = Some(hiLoBytetoInt bytes) })
+    | 21 -> Ok({ sensorData with ChargingState = Some(parseChargingState packetInfo.Bytes.[0])})
+    | 25 -> Ok({ sensorData with BatteryCharge = Some((hiLoBytetoInt bytes) * 1<mAh>)})
+    | 46 -> Ok({ sensorData with LightBumpLeftSignal        = Some(hiLoBytetoInt bytes) })
+    | 47 -> Ok({ sensorData with LightBumpFrontLeftSignal   = Some(hiLoBytetoInt bytes) })
+    | 48 -> Ok({ sensorData with LightBumpCenterLeftSignal  = Some(hiLoBytetoInt bytes) })
+    | 49 -> Ok({ sensorData with LightBumpCenterRightSignal = Some(hiLoBytetoInt bytes) })
+    | 50 -> Ok({ sensorData with LightBumpFrontRightSignal  = Some(hiLoBytetoInt bytes) })
+    | 51 -> Ok({ sensorData with LightBumpRightSignal       = Some(hiLoBytetoInt bytes) })
     | _ -> 
         Error(sprintf "I don't know how to parse packet id %i" packetInfo.PacketId)
 

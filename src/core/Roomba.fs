@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open System.Diagnostics
 open Sensors
+open SensorPacket
 open OperatingMode
 
 type Direction = 
@@ -114,7 +115,21 @@ module Roomba =
                 roomba.ReceivedByteLog.Dequeue() |> ignore
 
     let beginStreaming roomba =
-        let requestedPackets = [| 46uy; 47uy; 48uy; 49uy; 50uy; 51uy; 21uy; 19uy; 20uy; 25uy |]
+        let requestedPackets = 
+            [| 
+                LightBumpLeftSignal
+                LightBumpFrontLeftSignal
+                LightBumpCenterLeftSignal
+                LightBumpCenterRightSignal
+                LightBumpFrontRightSignal
+                LightBumpRightSignal
+                ChargingState
+                Distance
+                Angle
+                BatteryCharge
+            |]
+            |> Array.map getId
+            
         let numberOfPackets = [| requestedPackets |> Array.length |> byte |]
         let commandData = { OpCode = 148uy; DataBytes = Array.append numberOfPackets requestedPackets }
         roomba.SendCommand commandData

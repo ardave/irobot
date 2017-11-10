@@ -21,6 +21,7 @@
     <Compile Include="CommandData.fs" />
     <Compile Include="OperatingMode.fs" />
     <Compile Include="SensorData.fs" />
+    <Compile Include="SensorPacket.fs" />
     <Compile Include="PacketGroupParsing.fs" />
     <Compile Include="SensorDataPrinting.fs" />
     <Compile Include="Command.fs" />
