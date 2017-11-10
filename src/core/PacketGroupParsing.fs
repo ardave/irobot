@@ -87,7 +87,9 @@ let addPacketToSensorData sensorData packetInfo =
             | None         -> Some(additionalDegrees)
         Ok({ sensorData with Angle = newmms })
     | 21 ->
-        Ok({ sensorData with ChargingState = Some (parseChargingState packetInfo.Bytes.[0])})
+        Ok({ sensorData with ChargingState = Some(parseChargingState packetInfo.Bytes.[0])})
+    | 25 -> 
+        Ok({ sensorData with BatteryCharge = Some((hiLoBytetoInt bytes) * 1<mAh>)})
     | 46 -> 
         Ok({ sensorData with LightBumpLeftSignal        = Some(hiLoBytetoInt bytes) })
     | 47 -> 
@@ -116,11 +118,6 @@ let parseLightBumpSensors byteList =
             rev 
             |> List.skip 2 // skip Packet ID and Byte count byte
             |> List.fold (fun (sensorDataOpt, parsingState, totalBytesRemaining) currentByte ->
-                // printfn "*****************************************"
-                // printfn "currentByte: %A" currentByte
-                // printfn "sensorData: %A" sensorData
-                // printfn "parsingState: %A" parsingState
-                // printfn "totalBytesRemaining: %A" totalBytesRemaining
                 match sensorDataOpt with
                 | Error _ -> (sensorDataOpt, parsingState, totalBytesRemaining - 1)
                 | Ok sensorData ->
@@ -150,12 +147,6 @@ let parseLightBumpSensors byteList =
                             (Ok(sensorData), ParsingPacket(newPacketInfo), totalBytesRemaining - 1)
                 ) (Ok(defaultSensorData), SeekingPacketNumber, int rev.[1])
             |> fstOf3
-
-        // byteList
-        // |> List.map int
-        // |> List.rev
-        // |> printfn "The Bytes are %A "
-        // printfn "%A" sensorData
         sensorData
 
 let parsePacketGroup byteList = function
