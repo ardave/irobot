@@ -1,5 +1,6 @@
 module PacketGroupParsing
 
+open System
 open BitStuff
 open iRobot
 open Sensors
@@ -141,7 +142,11 @@ let parseLightBumpSensors byteList =
             |> fstOf3
         sensorData
 
-let parsePacketGroup byteList = function
-    | Group100         -> parsePacketGroup100 byteList
-    | LightBumpSensors -> parseLightBumpSensors byteList
-        
+let parsePacketGroup byteList packetGroup =
+    let result = ResultBuilder()
+    result {
+        let! sensorData = match packetGroup with
+                          | Group100         -> parsePacketGroup100 byteList
+                          | LightBumpSensors -> parseLightBumpSensors byteList
+        return { sensorData with Timestamp = DateTime.Now }
+    }

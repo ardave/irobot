@@ -1,5 +1,7 @@
 module Sensors
 
+open System
+
 open BitStuff
 open iRobot
 
@@ -108,6 +110,7 @@ type SensorData = {
     MainBrushMotorCurrent        : int<mA> option
     SideBrushMotorCurrent        : int<mA> option
     Stasis                       : bool option
+    Timestamp                     : DateTime
 }
 
 let defaultSensorData = {
@@ -160,6 +163,7 @@ let defaultSensorData = {
     MainBrushMotorCurrent        = None
     SideBrushMotorCurrent        = None
     Stasis                       = None
+    Timestamp                    = DateTime.Now
 }
 
 type PacketGroup = 

@@ -155,7 +155,6 @@ module Roomba =
             lastPrintedAt
 
     let private parsePacketGroup e b =
-        let sw = Stopwatch.StartNew()
         let sensorDataResult = PacketGroupParsing.parsePacketGroup (b::e.BytesReceived) e.PacketGroup
         // printfn "Parsed packet group in %i ms." sw.ElapsedMilliseconds
 
